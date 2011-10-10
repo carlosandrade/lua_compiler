@@ -47,8 +47,7 @@ private boolean isStatStarter(Token currentToken)
 //no codigo nao funciona! No parserX() que ele deve ser refletido como Dummy. Verificar isso.
 private boolean isStarterPrefixexp1(Token currentToken)
 {
-    if((currentToken.kind == Token.COLON) || (currentToken.kind == Token.LPAREN)
-     || (currentToken.kind == Token.LCURLY) || (currentToken.kind == Token.STRING))
+    if((currentToken.kind == Token.COLON) || isStartersArgs())
      {return true}
      else return false
 }
@@ -59,8 +58,14 @@ private boolean isStarterPrefixexp2(Token currentToken)
      {return true}
      else return false
 }
-
-
+//--> s(args) = {'(','{', String}
+private boolean isStarterArgs(Token currentToken)
+{
+    if((currentToken.kind == Token.LPAREN) || (currentToken.kind == Token.LCURLY)
+    || (currentToken.kind == Token.STRING))
+     {return true}
+     else return false    
+}
 
 /*****************************************************************/
 
@@ -181,7 +186,94 @@ private void parseVar()
     }
     
 }
+//namelist::=Name (`,` Name)*
+private void parseNamelist()
+{
+    accept(Token.NAME);
+    while(currentToken.kind == Token.COMMA)
+    {
+        acceptIt();
+        parseExp();
+    }
+}
+//explist::= exp (`,` exp)* 
+private void parseExplist()
+{
+    parseExp();
+    while(currentToken.kind == Token.COMMA)
+    {
+        acceptIt();
+        parseExp();
+    }
+}
+//prefixexp::=  (Name| '(' exp ')' ) prefixexp1 prefixexp2
+public void parsePrefixexp()
+{
+    switch(currentToken.kind)
+    {
+        case Token.NAME:
+        {
+            acceptIt();
+        }
+        case Token.LPAREN:
+        {
+            acceptIt();
+            parseExp();
+            accept(Token.RPAREN);
+        }
+    }
+    parsePrefixexp1();
+    parsePrefixexp2();
+}
 
+//prefixexp1::=  ( (`:` Name|&) args)  prefixexp1| &	
+public void parsePrefixexp1()
+{
+    if(currentToken.kind == Token.COLON || isArgsStarters())
+    {
+        if(currentToken.kind == Token.COLON)
+        {
+            acceptIt();
+            accept(Token.NAME);
+        }
+        parseArgs();
+        parsePrefix1();
+        
+    }
+    else
+        dummy();
+}
+
+//prefixexp2::= ((`[` exp `]` |  `.` Name )  prefixexp1) prefixexp2| &
+public void parsePrefixexp2()
+{
+    if(currentToken.kind == Token.LBRACKET || currentToken.kind == Token.RBRACKET)
+    {
+        switch(currentToken.kind)
+        {
+            case Token.LBRACKET:
+            {
+                acceptIt();
+                parseExp();
+                accept(Token.RBRACKET);
+            }
+            case Token.RBRACKET:
+            {
+                acceptIt();
+                accept(Token.NAME);
+            }
+        }
+        parsePrefixexp1();
+        parsePrefixexp2();
+    }
+    else 
+        dummy();
+}
+
+public void parseExp()
+{
+    
+}
 
 
 /* FALTA CONSERTAR ESSE BAGULHO MAS DA PRA APROVEITAR BOA PARTE DO CODIGO!
