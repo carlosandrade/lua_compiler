@@ -1,3 +1,7 @@
+//Lembrar que para cadeia vazia existe tratamento diferenciado das regras dependendo da situacao!
+//Em particular quando o metodo de verificacao de starter possui cadeia vazia entre os starters 
+// o que nao e inserido no codigo pois nao funcionaria
+
 /*
 Verifica se um dado token pertence aos starters de um não terminal
 */
@@ -269,7 +273,7 @@ public void parsePrefixexp2()
     else 
         dummy();
 }
-
+//exp::= (nil | false | true | Number | String | `…` | function |prefixexp | tableconstructor |  unop exp) exp1
 public void parseExp()
 {
     boolean isFunctionStarter = isFunctionStarter();
@@ -309,7 +313,136 @@ public void parseExp()
     }
     parseExp1();
 }
+//exp1::= binop exp exp1|&
+public void parseExp1()
+{
+    if(isBinopStarter())
+    {
+        parseBinop();
+        parseExp();
+        parseExp1();
+    }
+    else
+        dummy();
+}
+//args::= `(` (explist | &) `)` | tableconstructor | String 
+public void parseArgs()
+{
+    boolean isTableConstructorStarter = isTableConstructorStarter();
+    switch(currentToken.kind)
+    {
+        case Token.LPAREN:
+        {
+            acceptIt();
+            if(isExplistStarter())
+                parseExplist();
+            else
+                dummy();
+            accept(Token.RPAREN);
+        }
+        case Token.isTableConstructorStarter:
+            parseTableconstructor();
+        case Token.STRING:
+            acceptIt();
+        default:
+            //error
+    }
+}
+//function::= function funcbody 
+public void parseFunction()
+{
+    accept(Token.FUNCTION);
+    parseFuncbody();
+}
+//funcbody ::= `(` (parlist | & ) `)` block end
+public void parseFuncbody()
+{
+    accept(Token.LPAREN);
+    if(currentToken.kind == isParlistStarter(currentToken))
+        parseParlist();
+    else
+        dummy();
+    accept(Token.RPAREN);
+    parseBlock();
+    accept(Token.END);
+}
+//parlist::= namelist ( (`,` `…` )|&) | `…`
+public void parseNamelist()
+{
+    switch(currentToken.kind)
+    {
+        case isNamelistStarter():
+        {
+            if(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                accept(Token.THREEDOTES);
+            }
+            else
+                dummy();
+        }
+        case Token.THREEDOTES:
+            acceptit();
+        default:
+            //error
+    }
+}
+//tableconstructor::= `{` (fieldlist|&) `}` 
+public void parseTableconstructor()
+{
+    accept(Token.LCURLY);
+    if(currentToken.kind == isFieldListStarter())
+        parseFieldlist();
+    else
+        dummy();
+    accept(Token.RCURLY);
+}
+//fieldlist:= field (fieldsep (fieldlist | &) | &)
+public void parseFieldlist()
+{
+    if(currentToken.kind == isFieldStarter())
+    {
+        parseField();
+        parseFieldSep();
+        if(currentToken.kind == isFieldlistStarter())
+        {
+            parseFieldlist();
+        }
+        else
+            dummy();
+    }
+    else
+        dummy();
+}
+//field::= Name (`=` exp | prefixexp1 prefixexp2 exp1) | `[` exp `]` `=` exp | nil exp1| false exp1| 
+//true exp1| Number exp1| String exp1| `…` exp1| function exp1| '(' exp ')' prefixexp1 prefixexp2 exp1|
+// tableconstructor exp1|  unop exp exp1 
+public void parseField() {}
 
+//public void fieldsep::= `,` | `;` 
+public void parseFieldsep()
+{
+    switch(currentToken.kind)
+    {
+        case Token.COMMA:
+            acceptIt();
+        case Token.SEMICOLON:
+            acceptIt();
+        default:
+            //error
+    }
+}
+//binop
+public void parseBinop()
+{
+    if(isBinopStarter(currentToken))
+        acceptIt();
+}
+public void parseUnop()
+{
+    if(isUnopStarter(currentToken))
+        acceptIt();
+}
 
 /* FALTA CONSERTAR ESSE BAGULHO MAS DA PRA APROVEITAR BOA PARTE DO CODIGO!
 stat::= varlist `=` explist |
