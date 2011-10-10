@@ -1,6 +1,11 @@
 //chunk::= (stat (';'|&) )* (laststat (';'|&)|&)
+//--> s(stat) = {Name,'(', do, while, repeat, if, for, function,local}
 private void parseChunck(){
-    while(currentToken.kind == Token.STAT)
+    while((currentToken.kind == Token.NAME) || (currentToken.kind == Token.LPAREN)
+    || (currentToken.kind == Token.DO) || (currentToken.kind == Token.WHILE)
+    || (currentToken.kind == Token.REPEAT) || (currentToken.kind == Token.IF)
+    || (currentToken.kind == Token.IF) || (currentToken.kind == Token.FOR)
+    || (currentToken.kind == Token.FUNCTION) || (currentToken.kind == Token.LOCAL))
     {
         parseStat();
         if(currentToken.kind == Token.SEMICOLON)
@@ -8,7 +13,7 @@ private void parseChunck(){
         else
             dummy();
     }
-    if(currentToken.kind == Token.LASTSTAT)
+    if((currentToken.kind == Token.RETURN) || (currentToken.kind == Token.BREAK))
     {
         parseLaststat();
         if(currentToken.kind == Token.SEMICOLON)
@@ -22,7 +27,17 @@ private void parseChunck(){
         dummy();
 }
 
-/*
+
+
+
+
+
+
+
+
+
+
+/* FALTA CONSERTAR ESSE BAGULHO MAS DA PRA APROVEITAR BOA PARTE DO CODIGO!
 stat::= varlist `=` explist |
 		functioncall |
 		do block end |
@@ -157,7 +172,3 @@ private void parseStat()
 }
 
 private void dummy() {}
-
-
-//O que acontece em  Non-Terminal1::= A(Non-Terminal2|c). O livro fala para usar
-//Starters[Non-Terminal2 porem o livro usa Token.NON-TERMINAL2]

@@ -96,7 +96,7 @@ private byte scanToken(){
       case 'K':  case 'L':  case 'M':  case 'N':  case 'O':
       case 'P':  case 'Q':  case 'R':  case 'S':  case 'T':
       case 'U':  case 'V':  case 'W':  case 'X':  case 'Y':
-      case 'Z':
+      case 'Z':  case: '_':
         takeIt();
         while (isLetter(currentChar) || isDigit(currentChar))
           takeIt();
