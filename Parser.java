@@ -272,7 +272,42 @@ public void parsePrefixexp2()
 
 public void parseExp()
 {
+    boolean isFunctionStarter = isFunctionStarter();
+    boolean isPrefixexpStarter = isPrefixexpStarter();
+    boolean isTableconstructorStarter = isTableconstructorStarter();
+    boolean isUnopStarter = isUnopStarter();
     
+    switch(currentToken)
+    {
+        case Token.NIL:
+            acceptIt();
+        case Token.FALSE:
+            acceptIt();
+        case Token.TRUE:
+            acceptIt();
+        case Token.NUMBER:
+            acceptIt();
+        case Token.STRING:
+            acceptIt();
+        case Token.THREEDOTES:
+            acceptIt();
+        case Token.FUNCTION:
+            acceptIt();
+        case isFunctionStarter:
+            parseFunction();
+        case isPrefixexpStarter:
+            parsePrefixexp();
+        case isTableconstructorStarter:
+            parseTableConstructor();
+        case isUnopStarter:
+        {
+            parseUnopStarter();
+            parseExp();
+        }
+        default:
+            //error
+    }
+    parseExp1();
 }
 
 
