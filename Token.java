@@ -85,6 +85,9 @@ class Token extends Object{
     NAME        =   2,
     OPERATOR    =   3,
     
+    MINUS //-
+    VELHA //#
+    
     // reserved words - must be in alphabetical order...
     AND         =   4,
     BREAK       =   5,

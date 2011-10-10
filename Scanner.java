@@ -59,21 +59,9 @@ private boolean isDigit(char c) {
 }
 
 private boolean isLetter(char c) {
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c=='_');
 }
 
-// isBinop and isUnop returns true iff the given character is an operator character.
-
-private boolean isBinop(char c) {
-    return (c == '+' || c == '-' || c == '*' || c == '/' ||
-            c == '^' || c == '%' || c == '..' || c == '<' ||
-            c == '<=' || c == '>' || c == '>=' || c == '==' || 
-	        c == '~=' || c == 'and' || c == 'or');
-  }
-  
-private boolean isUnop(char c){
-    return (c == '-' || c == 'not' || c == '#');
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +70,7 @@ public Scanner(SourceFile source) {
   currentChar = sourceFile.getSource();
 }
 
-private byte scanToken(){
+private byte scanToken(){ 
       switch (currentChar) {
 
       case 'a':  case 'b':  case 'c':  case 'd':  case 'e':
@@ -100,28 +88,79 @@ private byte scanToken(){
         takeIt();
         while (isLetter(currentChar) || isDigit(currentChar))
           takeIt();
-        return Token.NAME;
+        return Token.NAME; //ok
 
       case '0':  case '1':  case '2':  case '3':  case '4':
       case '5':  case '6':  case '7':  case '8':  case '9':
         takeIt();
         while (isDigit(currentChar))
           takeIt();
-        return Token.INTLITERAL;
-
-      case '+':  case '-':  case '*': case '/':  case '^':
-      case '%':  case '..':  case '<':  case '<=':  case '>':
-      case '>=':  case '==':  case '~=': case 'and' case 'or'
-        takeIt();
-        while (isBinop(currentChar))
-          takeIt();
-        return Token.BINOP;
+        if(currentChar != '.')
+            return Token.INT;
+        else
+        {
+            case '0':  case '1':  case '2':  case '3':  case '4':
+            case '5':  case '6':  case '7':  case '8':  case '9':
+                takeIt();
+                while (isDigit(currentChar))
+                  takeIt();
+                return Token.FLOAT;
+        }
+            
         
-        case '-':  case 'not':  case '#':
-          takeIt();
-          while (isBinop(currentChar))
-            takeIt();
-          return Token.UNOP;
+        
+
+      case '+':  
+        takeIt();
+        return Token.PLUS;
+      case '-':
+        takeIt();
+        return Token.MINUS;
+      case '*': 
+        takeIt();
+        return Token.TIMES;
+      case '/':  
+        takeIt();
+        return Token.RBAR;
+      case '^':
+        takeIt();
+        return Token.CHAPEU;
+      case '%':  
+        takeIt();
+        return Token.PERCENT;
+      case '..': 
+        takeIt(); 
+        return Token.TWODOTES;
+      case '<':  
+        takeIt();
+        return Token.LESSTHAN;
+      case '<=':  
+        takeIt();
+        return Token.LESSOREQUALTHAN;
+      case '>':
+        takeIt();
+        return Token.MORETHAN;
+      case '>=':  
+        takeIt();
+        return Token.MOREOREQUALTHAN;
+      case '==':
+        takeIt();
+        return Token.EQUALS;
+      case '~=':
+        takeIt();
+        return Token.NOTEQUALS;
+      case 'and': 
+        takeIt();
+        return Token.AND;
+      case 'or':
+        takeIt();
+        return Token.OR;
+      case 'not':
+        takeit();
+        return Token.NOT;
+      case '#':
+        takeIt();
+        return Token.VELHA;
 
       case '\'':
         takeIt();
