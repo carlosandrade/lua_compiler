@@ -54,7 +54,7 @@ private void scanSeparator() {
   }
 }
 
-private boolean isDigit(char c) {
+private boolean isInt(char c) {
   return (c >= '0' && c <= '9');
 }
 
@@ -70,31 +70,71 @@ public Scanner(SourceFile source) {
   currentChar = sourceFile.getSource();
 }
 
-private byte scanToken(){ 
-      switch (currentChar) {
-
-      case 'a':  case 'b':  case 'c':  case 'd':  case 'e':
-      case 'f':  case 'g':  case 'h':  case 'i':  case 'j':
-      case 'k':  case 'l':  case 'm':  case 'n':  case 'o':
-      case 'p':  case 'q':  case 'r':  case 's':  case 't':
-      case 'u':  case 'v':  case 'w':  case 'x':  case 'y':
-      case 'z':
-      case 'A':  case 'B':  case 'C':  case 'D':  case 'E':
-      case 'F':  case 'G':  case 'H':  case 'I':  case 'J':
-      case 'K':  case 'L':  case 'M':  case 'N':  case 'O':
-      case 'P':  case 'Q':  case 'R':  case 'S':  case 'T':
-      case 'U':  case 'V':  case 'W':  case 'X':  case 'Y':
-      case 'Z':  case: '_':
+private int scanToken()
+{int kind;
+    
+    if(isNameStarter(currentChar)) //NAME::= ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'_'|'0'..'9')*
+        return scanName();
+    else if(isIntStarter(currentChar)) //INT::= ('0'..'9')('0'..'9')*
+    {
+        kind = scanInt();
+        if(currentChar == '.') //FLOAT::= INT '.' INT
+        {
+            takeIt();
+            scanInt();
+            kind = Token.FLOAT;
+        }
+        switch(currentChar)
+        {
+            case 'E':
+            case 'e':
+                takeIt();
+                if(currentChar == '-')
+                    takeIt();
+                if(isIntStart(currentChar))
+                    scanInt();
+                else
+                    return Token.ERROR;
+        }
+    }   
+    else
+        return Token.ERROR;
+}
+private int scanName(){ 
+    switch (currentChar) 
+    {
+        case 'a':  case 'b':  case 'c':  case 'd':  case 'e':
+        case 'f':  case 'g':  case 'h':  case 'i':  case 'j':
+        case 'k':  case 'l':  case 'm':  case 'n':  case 'o':
+        case 'p':  case 'q':  case 'r':  case 's':  case 't':
+        case 'u':  case 'v':  case 'w':  case 'x':  case 'y':
+        case 'z':
+        case 'A':  case 'B':  case 'C':  case 'D':  case 'E':
+        case 'F':  case 'G':  case 'H':  case 'I':  case 'J':
+        case 'K':  case 'L':  case 'M':  case 'N':  case 'O':
+        case 'P':  case 'Q':  case 'R':  case 'S':  case 'T':
+        case 'U':  case 'V':  case 'W':  case 'X':  case 'Y':
+        case 'Z':  case: '_':
+            takeIt();
+    
+        while (isLetter(currentChar) || isNumber(currentChar))
+            takeIt();
+        return Token.NAME; 
+        default:
+            takeIt();
+            return Token.ERROR;
+    }
+}
+private int scanInt(){ 
+    switch(currentChar)
+    {
+        case '0':  case '1':  case '2':  case '3':  case '4':
+        case '5':  case '6':  case '7':  case '8':  case '9':
+            takeIt();
+    }
+    while (isInt(currentChar))
         takeIt();
-        while (isLetter(currentChar) || isDigit(currentChar))
-          takeIt();
-        return Token.NAME; //ok
-
-      case '0':  case '1':  case '2':  case '3':  case '4':
-      case '5':  case '6':  case '7':  case '8':  case '9':
-        takeIt();
-        while (isDigit(currentChar))
-          takeIt();
+     
         if(currentChar != '.')
             return Token.INT;
         else
