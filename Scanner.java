@@ -1,38 +1,4 @@
-public class Scanner{
-    private char currentChar;
-    
-    //Kind and spelling of the current token:
-    
-    private byte currentKind;
-    private StringBuffer currentSpelling;
-    
-    //Etc
-    
-    private SourceFile sourceFile;
-    private boolean currentlyScanningToken;
-
-    // take verifies and appends the current character to the current token, 
-    //and gets the next character from the source program.
-
-private void take (char expectedChar){
-    if (currentChar == expectedChar)
-    {
-        currentSpelling.append(currentChar);
-        currentChar = sourceFile.getSource();
-    }else
-        //report syntax error
-    }
-}
-
-// takeIt appends the current character to the current token, and gets
-// the next character from the source program.
-
-private void takeIt(){
-    if(currentlyScanningToken)
-        currentSpelling.append(currentChar);
-    currentChar = sourceFile.getSource()
-    
-}
+/*
 
 // scanSeparator skips a single separator.
 
@@ -61,45 +27,282 @@ private boolean isInt(char c) {
 private boolean isLetter(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c=='_');
 }
-
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
+
+public class Scanner{
+    private char currentChar;
+    
+    //Kind and spelling of the current token:
+    
+    //private byte currentKind;
+    private StringBuffer currentSpelling;
+    
+    //Etc
+    
+    private SourceFile sourceFile;
+    private boolean currentlyScanningToken;
+
+    // take verifies and appends the current character to the current token, 
+    //and gets the next character from the source program.
+
+
 
 public Scanner(SourceFile source) {
   sourceFile = source;
   currentChar = sourceFile.getSource();
 }
 
+// takeIt appends the current character to the current token, and gets
+// the next character from the source program.
+
+private void takeIt(){
+    if(currentlyScanningToken)
+        currentSpelling.append(currentChar);
+    currentChar = sourceFile.getSource()
+    
+}
+
+private void take (char expectedChar){
+    if (currentChar == expectedChar)
+    {
+        currentSpelling.append(currentChar);
+        currentChar = sourceFile.getSource();
+    }else
+        //report syntax error
+    }
+}
+
+//erros sao definidos aqui em producoes que nao foram modularizadas e nos metodos que foram construidos
 private int scanToken()
 {int kind;
     
     if(isNameStarter(currentChar)) //NAME::= ('a'..'z'|'A'..'Z'|'_')('a'..'z'|'A'..'Z'|'_'|'0'..'9')*
         return scanName();
-    else if(isIntStarter(currentChar)) //INT::= ('0'..'9')('0'..'9')*
+    else if(isIntStarter(currentChar)) //Comeca a verificacao de ser INT, FLOAT ou EXP
     {
-        kind = scanInt();
+        kind = scanInt(); //INT::= ('0'..'9')('0'..'9')*
         if(currentChar == '.') //FLOAT::= INT '.' INT
         {
             takeIt();
-            scanInt();
+            if(isIntStarter(currentChar))
+                scanInt();
+            else
+                return Token.ERROR;
             kind = Token.FLOAT;
         }
-        switch(currentChar)
+        switch(currentChar) //Verifica se EXP::= (INT| FLOAT) ('E'|'e') (('-')|&) INT;
         {
             case 'E':
             case 'e':
                 takeIt();
-                if(currentChar == '-')
+                if(currentChar == '-') //Se possui '-' opcional
                     takeIt();
-                if(isIntStart(currentChar))
-                    scanInt();
+                if(isIntStarter(currentChar)) //Producao deve Concanetar com INT para formar EXP
+                {
+                    scanInt(); 
+                    return Token.EXP; 
+                }
                 else
-                    return Token.ERROR;
+                    return Token.ERROR; //Producao nao concatenou com INT
+            default:
+                    return kind; //Token = Int, ou Token = Float
         }
-    }   
-    else
-        return Token.ERROR;
+    }
+    else if(isHexStarter(currentChar))//HEX::= '0x' ('0'..'9'| 'a'..'f')('0'..'9'| 'a'..'f')* ;
+        return scanHex();
+    else if(isNormalstringStarter(currentChar))
+        return scanNormalString();
+    else if(isCharStringStarter(currentChar))
+        return scanCharString();
+    else if(isLongStringStarter(currentChar))
+        return scanLongString();
+    else if(isCommentStarter(currentChar))
+        return scanComment();
+    else if(isLinecommentStarter(currentChar))
+        return scanLinecomment();
+    else if(isWsStarter(currentChar))
+        return scanWs();
+    else if(isNewlineStarter(currentChar))
+        return scanNewline();
+    switch(currentChar)
+    {
+        case '+':  
+          takeIt();
+          return Token.PLUS;
+        case '-':
+          takeIt();
+          return Token.MINUS;
+        case '*': 
+          takeIt();
+          return Token.TIMES;
+        case '/':  
+          takeIt();
+          return Token.RBAR;
+        case '^':
+          takeIt();
+          return Token.CHAPEU;
+        case '%':  
+          takeIt();
+          return Token.PERCENT;
+        case '..': 
+          takeIt(); 
+          return Token.TWODOTES;
+        case '<':  
+          takeIt();
+          return Token.LESSTHAN;
+        case '<=':  
+          takeIt();
+          return Token.LESSOREQUALTHAN;
+        case '>':
+          takeIt();
+          return Token.MORETHAN;
+        case '>=':  
+          takeIt();
+          return Token.MOREOREQUALTHAN;
+        case '==':
+          takeIt();
+          return Token.EQUALS;
+        case '~=':
+          takeIt();
+          return Token.NOTEQUALS;
+        case 'and': 
+          takeIt();
+          return Token.AND;
+        case 'or':
+          takeIt();
+          return Token.OR;
+        case 'not':
+          takeit();
+          return Token.NOT;
+        case '#':
+          takeIt();
+          return Token.VELHA;
+        case '.':
+          takeIt();
+          return Token.DOT;
+/*como e feito um becomes da triangle, `:=` vamos precisar disso para as outras partes
+        case ':':
+          takeIt();
+          if (currentChar == '=') {
+            takeIt();
+            return Token.BECOMES;
+          } else
+            return Token.COLON;
+*/
+        case ';':
+          takeIt();
+          return Token.SEMICOLON;
+
+        case ',':
+          takeIt();
+          return Token.COMMA;
+
+        case '~':
+          takeIt();
+          return Token.IS;
+
+        case '(':
+          takeIt();
+          return Token.LPAREN;
+
+        case ')':
+          takeIt();
+          return Token.RPAREN;
+
+        case '[':
+          takeIt();
+          return Token.LBRACKET;
+
+        case ']':
+          takeIt();
+          return Token.RBRACKET;
+
+        case '{':
+          takeIt();
+          return Token.LCURLY;
+
+        case '}':
+          takeIt();
+          return Token.RCURLY;
+
+        case SourceFile.EOT:
+          return Token.EOT;
+
+        default:
+          takeIt();
+          return Token.ERROR;  
+    }    
 }
+public Token scan(){
+     Token tok;
+      SourcePosition pos;
+      int kind;
+
+      currentlyScanningToken = false;
+      while (isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter())
+        scanSeparator();
+      currentlyScanningToken = true;
+      currentSpelling = new StringBuffer("");
+      pos = new SourcePosition();
+      pos.start = sourceFile.getCurrentLine();
+
+      kind = scanToken();
+
+      pos.finish = sourceFile.getCurrentLine();
+      tok = new Token(kind, currentSpelling.toString(), pos);
+      if (debug)
+        System.out.println(tok);
+      return tok;
+    }
+}
+
+}
+
+
+private boolean isNameStarter(char currentChar)
+{
+    if( (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
+    (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f') ||
+    (currentChar == 'g') || (currentChar == 'h') || (currentChar == 'i')
+    || (currentChar == 'j') || (currentChar == 'k') || (currentChar == 'l')
+    (currentChar == 'm') || (currentChar == 'n') || (currentChar == 'o')
+    || (currentChar == 'p') || (currentChar == 'q') || (currentChar == 'r')
+    || (currentChar == 's') || (currentChar == 't') || (currentChar == 'u')
+    || (currentChar == 'v') || (currentChar == 'w') || (currentChar == 'x')
+    || (currentChar == 'y') || (currentChar == 'y') || (currentChar == 'z')
+    
+    || (currentChar == 'A') || (currentChar == 'B') || (currentChar == 'C')
+    || (currentChar == 'D') || (currentChar == 'E') || (currentChar == 'F')
+    || (currentChar == 'G') || (currentChar == 'H') || (currentChar == 'I')
+    || (currentChar == 'J') || (currentChar == 'K') (currentChar == 'L')
+    || (currentChar == 'M') || (currentChar == 'N') || (currentChar == 'O')
+    || (currentChar == 'P') || (currentChar == 'Q') || (currentChar == 'R')
+    || (currentChar == 'S') || (currentChar == 'T') || (currentChar == 'U')
+    || (currentChar == 'V') || (currentChar == 'W') || (currentChar == 'X')
+    || (currentChar == 'Y') || (currentChar == 'Z') || (currentChar == '_'))
+    {return true}
+    else
+        return false
+}
+private boolean isIntStarter(char currentChar)
+{
+    if( (currentChar == '0') || (currentChar == '1') || (currentChar == '2') || 
+    (currentChar == '3') || (currentChar == '4') || (currentChar == '5') ||
+    (currentChar == '6') || (currentChar == '7') || (currentChar == '8')    
+    || (currentChar == '9'))
+    {return true}
+    else
+        return false
+}
+private boolean isHexStarter(char currentChar)
+{
+    
+}
+
+/*
+
 private int scanName(){ 
     switch (currentChar) 
     {
@@ -150,152 +353,12 @@ private int scanInt(){
         
         
 
-      case '+':  
-        takeIt();
-        return Token.PLUS;
-      case '-':
-        takeIt();
-        return Token.MINUS;
-      case '*': 
-        takeIt();
-        return Token.TIMES;
-      case '/':  
-        takeIt();
-        return Token.RBAR;
-      case '^':
-        takeIt();
-        return Token.CHAPEU;
-      case '%':  
-        takeIt();
-        return Token.PERCENT;
-      case '..': 
-        takeIt(); 
-        return Token.TWODOTES;
-      case '<':  
-        takeIt();
-        return Token.LESSTHAN;
-      case '<=':  
-        takeIt();
-        return Token.LESSOREQUALTHAN;
-      case '>':
-        takeIt();
-        return Token.MORETHAN;
-      case '>=':  
-        takeIt();
-        return Token.MOREOREQUALTHAN;
-      case '==':
-        takeIt();
-        return Token.EQUALS;
-      case '~=':
-        takeIt();
-        return Token.NOTEQUALS;
-      case 'and': 
-        takeIt();
-        return Token.AND;
-      case 'or':
-        takeIt();
-        return Token.OR;
-      case 'not':
-        takeit();
-        return Token.NOT;
-      case '#':
-        takeIt();
-        return Token.VELHA;
 
-      case '\'':
-        takeIt();
-        takeIt(); // the quoted character
-        if (currentChar == '\'') {
-        	takeIt();
-          return Token.CHARLITERAL;
-        } else
-          return Token.ERROR;
-
-      case '.':
-        takeIt();
-        return Token.DOT;
-
-      case ':':
-        takeIt();
-        if (currentChar == '=') {
-          takeIt();
-          return Token.BECOMES;
-        } else
-          return Token.COLON;
-
-      case ';':
-        takeIt();
-        return Token.SEMICOLON;
-
-      case ',':
-        takeIt();
-        return Token.COMMA;
-
-      case '~':
-        takeIt();
-        return Token.IS;
-
-      case '(':
-        takeIt();
-        return Token.LPAREN;
-
-      case ')':
-        takeIt();
-        return Token.RPAREN;
-
-      case '[':
-        takeIt();
-        return Token.LBRACKET;
-
-      case ']':
-        takeIt();
-        return Token.RBRACKET;
-
-      case '{':
-        takeIt();
-        return Token.LCURLY;
-
-      case '}':
-        takeIt();
-        return Token.RCURLY;
-
-      case SourceFile.EOT:
-        return Token.EOT;
-
-      default:
-        takeIt();
-        return Token.ERROR;
       }
     }
 
 }
 
-public Token scan(){
-     Token tok;
-      SourcePosition pos;
-      int kind;
-
-      currentlyScanningToken = false;
-      while (currentChar == '!'
-             || currentChar == ' '
-             || currentChar == '\n'
-             || currentChar == '\r'
-             || currentChar == '\t')
-        scanSeparator();
-
-      currentlyScanningToken = true;
-      currentSpelling = new StringBuffer("");
-      pos = new SourcePosition();
-      pos.start = sourceFile.getCurrentLine();
-
-      kind = scanToken();
-
-      pos.finish = sourceFile.getCurrentLine();
-      tok = new Token(kind, currentSpelling.toString(), pos);
-      if (debug)
-        System.out.println(tok);
-      return tok;
-    }
 
 }
-}
+*/
