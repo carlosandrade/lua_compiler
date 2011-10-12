@@ -21,13 +21,7 @@ private void scanSeparator() {
   }
 }
 
-private boolean isInt(char c) {
-  return (c >= '0' && c <= '9');
-}
 
-private boolean isLetter(char c) {
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c=='_');
-}
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +81,7 @@ private int scanToken()
         takeIt(); //('0'..'9')
         if(currentChar == 'x')
             return scanHex(); //Starter de Hex '0x'
-        while(isIntStarter()) //('0'..'9')*
+        while(isIntStarter(currentChar)) //('0'..'9')*
             takeIt();
         kind = Token.INT;
         if(currentChar == '.') //FLOAT::= INT '.' INT
@@ -117,10 +111,10 @@ private int scanToken()
                     return kind; //Token = Int, ou Token = Float
         }
     }
-    else if(currentChar == '\\')
-        return scanNormalString();
+    else if(currentChar == '"')
+        return scanNormalstring();
     else if(currentChar == '\'')
-        return scanCharString();
+        return scanCharstring();
     else if((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C'))
         return scanWs();
     else if((currentChar == '\r') || (currentChar == '\n'))
@@ -132,6 +126,7 @@ private int scanToken()
           return Token.PLUS;
         case '-':
           takeIt();
+/*
           if(currentChar == '-')
           {
               takeIt();
@@ -141,6 +136,7 @@ private int scanToken()
                   return scanLinecomment();
           }
           else
+          */
               return Token.MINUS;
         case '*': 
             takeIt();
@@ -247,7 +243,7 @@ private int scanToken()
 public Token scan(){
      Token tok;
       SourcePosition pos;
-      int kind;
+      int kind = -1;
       currentlyScanningToken = false;
       //isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter()
       while ((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C')||
@@ -265,11 +261,9 @@ public Token scan(){
                 takeIt();
                 if(currentChar == '[')
                 {
-                    kind = scanComment();
-                    break;
+                    scanComment();
                 }else{
-                    kind = scanLinecomment();
-                    break;
+                    scanLinecomment();
                 }
             }else{    
                 kind = Token.MINUS;
@@ -285,10 +279,12 @@ public Token scan(){
     pos.start = sourceFile.getCurrentLine();
     if(kind != Token.MINUS)
         kind = scanToken();
+    //System.out.println("Testando"); // Tirar essa linha depois//Tirar essa linha depois
     pos.finish = sourceFile.getCurrentLine();
-    tok = new Token(kind, currentSpelling.toString(), pos);
-    if (debug)
-        System.out.println(tok);
+    tok = new Token(kind, currentSpelling.toString());
+    //System.out.println("Kind: "+tok.kind+" Spelling: "+tok.spelling); // Tirar essa linha depois
+//    if (debug)
+//        System.out.println(tok);
       
     
     
@@ -375,21 +371,22 @@ private int scanEscapeSequence()
         return Token.ERROR;    
 }
 private int scanLongstring()
-{int contigual = 0;
+{int count = 0;
     //Neste ponto ja verificou que esta usando colchete e ja aceitou para diferenciar em scanToken() o =
     while(currentChar == '=')
         takeIt();
-        contigual++;
+        count++;
     take('[');
     while((currentChar == '\\') || (!(currentChar == '\\')) || (!(currentChar == ']')) || (!(currentChar == SourceFile.EOT)))
     {
-        scanEscapesequence();
+        if(scanEscapeSequence() == Token.ERROR)
+            return Token.ERROR;
     }
     if(currentChar == ']')
         takeIt();
-    else if(currentchar == SourceFile.EOT)
+    else if(currentChar == SourceFile.EOT)
         return Token.ERROR;
-    while((currentChar == '=') && (contigual > 0))
+    while((currentChar == '=') && (count > 0))
     {
         takeIt();
         count--;
@@ -412,7 +409,7 @@ private int scanComment()
             if(currentChar == ']')
             {
                 takeIt();
-                return Token.COMMENT;
+                return Token.OK;
             }
             else
                 takeIt();
@@ -422,21 +419,34 @@ private int scanComment()
     }
     if(currentChar == SourceFile.EOT)
         return Token.ERROR;
+    return Token.ERROR;
 }
 private int scanWs()
 {
     if(currentChar == ' ')
+    {
         takeIt();
+        return Token.OK;
+    }
     if(currentChar == '\t')
+    {
         takeIt();
-    if(currentCHar == '\u000C')
+        return Token.OK;
+    }
+    if(currentChar == '\u000C')
+    {
         takeIt();
+        return Token.OK;
+    }
+    else
+        return Token.ERROR;
 }
 private int scanNewline()
 {
     if(currentChar == '\r')
         takeIt();
     take('\n');
+    return Token.OK;
 }
 private int scanLinecomment()
 { //Neste ponto os -- ja foram lidos para diferenciar entre linecomment e comment
@@ -449,6 +459,7 @@ private int scanLinecomment()
         takeIt();
     if(currentChar == SourceFile.EOT)
         return Token.ERROR;
+    return Token.ERROR;
 }
 private int scanCharstring()
 {
@@ -456,7 +467,7 @@ private int scanCharstring()
     while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '\'')) ||
     (!(currentChar == SourceFile.EOT)))
     {
-        if(scanEscapeSequence() == SourceFile.ERROR)
+        if(scanEscapeSequence() == Token.ERROR)
             return Token.ERROR;        
     }
     if(currentChar == '\'')
@@ -471,7 +482,7 @@ private int scanNormalstring()
 {
     take('"');
     //O or redundante em \\ e so para ficar legivel com a gramatica
-    while( (currentChar == '\\') || (!(currentChar == '\\')) || (!(currentChar == '"')) ||
+    while((!(currentChar == '"')) ||
     (!(currentChar == SourceFile.EOT))) 
     {
         if((currentChar=='\\'))
@@ -529,22 +540,19 @@ private int scanHex()
 {
     //Ja teve que aceitar 0 para diferenciar numero de hex que e 0x
     take('x');
-    if(isIntStarter() || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
+    if(isIntStarter(currentChar) || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
     (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f'))
         takeIt();
     else
         return Token.ERROR;
-    while(isIntStarter() || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
+    while(isIntStarter(currentChar) || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
     (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f'))
         takeIt();
     return Token.HEX;
 }
-}
-
-/*
 
 private int scanName(){ 
-    switch (currentChar) 
+/*    switch (currentChar) 
     {
         case 'a':  case 'b':  case 'c':  case 'd':  case 'e':
         case 'f':  case 'g':  case 'h':  case 'i':  case 'j':
@@ -557,16 +565,26 @@ private int scanName(){
         case 'K':  case 'L':  case 'M':  case 'N':  case 'O':
         case 'P':  case 'Q':  case 'R':  case 'S':  case 'T':
         case 'U':  case 'V':  case 'W':  case 'X':  case 'Y':
-        case 'Z':  case: '_':
+        case 'Z':  case '_': */
+        if(isLetter(currentChar))
             takeIt();
+        else
+            return Token.ERROR;
     
-        while (isLetter(currentChar) || isNumber(currentChar))
+        while (isLetter(currentChar) || isInt(currentChar))
             takeIt();
         return Token.NAME; 
-        default:
+  /*      default:
             takeIt();
-            return Token.ERROR;
-    }
+            return Token.ERROR; 
+    }*/
+}
+private boolean isInt(char c) {
+  return (c >= '0' && c <= '9');
+}
+
+private boolean isLetter(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c=='_');
 }
 private int scanInt(){ 
     switch(currentChar)
@@ -577,7 +595,42 @@ private int scanInt(){
     }
     while (isInt(currentChar))
         takeIt();
-     
+    return Token.INT;
+}
+
+
+public static void main(String args[])
+{
+    Token tok;
+    SourceFile source = new SourceFile("teste.txt");
+    Scanner scanner = new Scanner(source);
+    do{
+        tok = scanner.scan();
+        System.out.println("Kind: "+tok.kind+" Spelling: "+tok.spelling); // Tirar essa linha depois
+        
+    }while(tok.kind != 56);
+    //tok = scanner.scan();
+//    System.out.print(token.spelling);
+
+}
+
+}
+
+
+
+/*
+
+
+private int scanInt(){ 
+    switch(currentChar)
+    {
+        case '0':  case '1':  case '2':  case '3':  case '4':
+        case '5':  case '6':  case '7':  case '8':  case '9':
+            takeIt();
+    }
+    while (isInt(currentChar))
+        takeIt();
+}
         if(currentChar != '.')
             return Token.INT;
         else

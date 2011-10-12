@@ -65,6 +65,8 @@ class Token extends Object{
         this.spelling = spelling;
         //If kind is NAME(IDENTIFIER) and spelling matches one of the keywords,
         //change the token's kind accordingly:
+
+
         if(kind == NAME)
         {
             for(int k = AND ; k <= WHILE ; k++){
@@ -76,80 +78,81 @@ class Token extends Object{
             }
         }
     }
+    
+
     //Constants dnoting different kinds of token:
     public final static int 
     
     //name
 
-    NAME              =   2,
+    NAME              =   0,
 
     
     //especializa√ß√µes dos de cima
-    INT               =   3,
-    FLOAT             =   4,
+    INT               =   1,
+    FLOAT             =   2,
     EXP               =   5,
-    HEX               =   6,
-    NORMALSTRING      =   7,
-    CHARSTRING        =   8,
-    LONGSTRING        =   9,
+    HEX               =   3,
+    NORMALSTRING      =   4,
+    CHARSTRING        =   5,
+    LONGSTRING        =   6,
 
     //operadores    
-    MINUS             =  10,
-    VELHA             =  11,
-    PLUS              =  12,
-    TIMES             =  13,
-    RBAR              =  14,
-    PERCENT           =  15,
-    CHAPEU            =  16,
-    EQUALS            =  17,
-    BECOMES           =  18,
-    NOTEQUALS         =  19,
-    LESSOREQUALTHAN   =  20,
-    LESSTHAN          =  21,
-    MOREOREQUALTHAN   =  22,
-    MORETHAN          =  23,
-    LPAREN            =  24,
-    RPAREN            =  25,
-    LCURLY            =  26,
-    RCURLY            =  27,
-    LBRACKET          =  28,
-    RBRACKET          =  29,
-    DOT               =  30,
-    COLON             =  31,
-    SEMICOLON         =  32,
-    COMMA             =  33,
-    TWODOTES          =  34,
-    THREEDOTES        =  35,
-    OK                =  36,
-    COMMENT           =  37,
+    MINUS             =  7,
+    VELHA             =  8,
+    PLUS              =  9,
+    TIMES             =  10,
+    RBAR              =  11,
+    PERCENT           =  12,
+    CHAPEU            =  13,
+    EQUALS            =  14,
+    BECOMES           =  15,
+    NOTEQUALS         =  16,
+    LESSOREQUALTHAN   =  17,
+    LESSTHAN          =  18,
+    MOREOREQUALTHAN   =  19,
+    MORETHAN          =  20,
+    LPAREN            =  21,
+    RPAREN            =  22,
+    LCURLY            =  23,
+    RCURLY            =  24,
+    LBRACKET          =  25,
+    RBRACKET          =  26,
+    DOT               =  27,
+    COLON             =  28,
+    SEMICOLON         =  29,
+    COMMA             =  30,
+    TWODOTES          =  31,
+    THREEDOTES        =  32,
+    OK                =  33,
     
     
     // reserved words - must be in alphabetical order...
-    AND               =  38,
-    BREAK             =  39,
-    DO                =  40,
-    ELSE              =  42,
-    ELSEIF            =  43,
-    END               =  43,
-    FALSE             =  44,
-    FOR               =  45,
-    FUNCTION          =  46,
-    IF                =  47,
-    IN                =  48,
-    LOCAL             =  49,
-    NIL               =  50,
-    NOT               =  51,
-    OR                =  52,
-    REPEAT            =  53,
-    RETURN            =  54,
-    THEN              =  55,
-    TRUE              =  56,
-    UNTIL             =  57,
-    WHILE             =  58,
+    AND               =  34,
+    BREAK             =  35,
+    DO                =  36,
+    ELSE              =  37,
+    ELSEIF            =  38,
+    END               =  39,
+    FALSE             =  40,
+    FOR               =  41,
+    FUNCTION          =  42,
+    IF                =  43,
+    IN                =  44,
+    LOCAL             =  45,
+    NIL               =  46,
+    NOT               =  47,
+    OR                =  48,
+    REPEAT            =  49,
+    RETURN            =  50,
+    THEN              =  51,
+    TRUE              =  52,
+    UNTIL             =  53,
+    WHILE             =  54,
         
     // special tokens...
-    EOT         =   38,
-    ERROR       =   39;
+    EOT         =   56,
+    ERROR       =   57;
     
     //
     
@@ -190,9 +193,10 @@ class Token extends Object{
         ":",
         ";",
         ",",
-        "=",
         "..",
         "...",
+        "ok",
+        
         
         "and",
         "break",
@@ -215,7 +219,7 @@ class Token extends Object{
         "true",
         "until",
         "while",
-
+        "",
          "<error>"
      };      
 }
