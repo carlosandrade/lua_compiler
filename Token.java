@@ -79,70 +79,120 @@ class Token extends Object{
     //Constants dnoting different kinds of token:
     public final static int 
     
-    //literals, identifiers, operators..
-    INTLITERAL  =   0,
-    CHARLITERAL =   1,
-    NAME        =   2,
-    OPERATOR    =   3,
+    //name
+
+    NAME              =   2,
+
     
-    MINUS //-
-    VELHA //#
+    //especializa√ß√µes dos de cima
+    INT               =   3,
+    FLOAT             =   4,
+    EXP               =   5,
+    HEX               =   6,
+    NORMALSTRING      =   7,
+    CHARSTRING        =   8,
+    LONGSTRING        =   9,
+
+    //operadores    
+    MINUS             =  10,
+    VELHA             =  11,
+    PLUS              =  12,
+    TIMES             =  13,
+    RBAR              =  14,
+    PERCENT           =  15,
+    CHAPEU            =  16,
+    EQUALS            =  17,
+    BECOMES           =  18,
+    NOTEQUALS         =  19,
+    LESSOREQUALTHAN   =  20,
+    LESSTHAN          =  21,
+    MOREOREQUALTHAN   =  22,
+    MORETHAN          =  23,
+    LPAREN            =  24,
+    RPAREN            =  25,
+    LCURLY            =  26,
+    RCURLY            =  27,
+    LBRACKET          =  28,
+    RBRACKET          =  29,
+    DOT               =  30,
+    COLON             =  31,
+    SEMICOLON         =  32,
+    COMMA             =  33,
+    TWODOTES          =  34,
+    THREEDOTES        =  35,
+    OK                =  36,
+    COMMENT           =  37,
+    
     
     // reserved words - must be in alphabetical order...
-    AND         =   4,
-    BREAK       =   5,
-    DO          =   6,
-    ELSE        =   7,
-    ELSEIF      =   8,
-    END         =   9,
-    FALSE       =   10,
-    FOR         =   11,
-    FUNCTION    =   12,
-    IF          =   13,
-    IN          =   14,
-    LOCAL       =   15,
-    NIL         =   16,
-    NOT         =   17,
-    OR          =   18,
-    REPEAT      =   19,
-    RETURN      =   20,
-    THEN        =   21,
-    TRUE        =   22,
-    UNTIL       =   23,
-    WHILE       =   24,
-    
-    // punctuation...
-    DOT         =   25,
-    COLON       =   26,
-    SEMICOLON   =   27,
-    COMMA       =   28,
-    BECOMES     =   29,
-    TWODOTES    =   30,
-    THREEDOTES  =   31,
-    
-    // brackets...
-    LPAREN      =   32,
-    RPAREN      =   33,
-    LBRACKET    =   34,
-    RBRACKET    =   35,
-    LCURLY      =   36,   
-    RCURLY      =   37,
-    
+    AND               =  38,
+    BREAK             =  39,
+    DO                =  40,
+    ELSE              =  42,
+    ELSEIF            =  43,
+    END               =  43,
+    FALSE             =  44,
+    FOR               =  45,
+    FUNCTION          =  46,
+    IF                =  47,
+    IN                =  48,
+    LOCAL             =  49,
+    NIL               =  50,
+    NOT               =  51,
+    OR                =  52,
+    REPEAT            =  53,
+    RETURN            =  54,
+    THEN              =  55,
+    TRUE              =  56,
+    UNTIL             =  57,
+    WHILE             =  58,
+        
     // special tokens...
     EOT         =   38,
     ERROR       =   39;
-    NORMALSTRING = 40;
-    CHARSTRING = 41;
     
+    //
     
     // Spellings of different kinds of 
     //token (must correspond to the token kinds above):
     
     private final static String[] spellings = {
-        "<int>",
-        "<char>",
         "<name>",
-        "<operator>",
+        "<int>",
+        "<float>",
+        "<exp>",
+        "<hex>",
+        "<normalstring>",
+        "<charstring>",
+        "<longstring>",
+
+        "-",
+        "#",
+        "+",
+        "*",
+        "/",
+        "%",
+        "^",
+        "==",
+        "=",
+        "~=",
+        "<=",
+        "<",
+        ">=",
+        ">",
+        "(",
+        ")",  
+        "{",
+        "}", 
+        "[",
+        "]", 
+        ".",
+        ":",
+        ";",
+        ",",
+        "=",
+        "..",
+        "...",
         
         "and",
         "break",
@@ -165,23 +215,6 @@ class Token extends Object{
         "true",
         "until",
         "while",
-        
-        ".",
-        ":",
-        ";",
-        ",",
-        "=",
-        "..",
-        "...",
-        
-        "(",
-         ")",
-         "[",
-         "]",
-         "{",
-         "}",
-         
-         "",
 
          "<error>"
      };      
