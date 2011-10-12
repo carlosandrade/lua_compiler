@@ -482,15 +482,14 @@ private int scanNormalstring()
 {
     take('"');
     //O or redundante em \\ e so para ficar legivel com a gramatica
-    while((!(currentChar == '"')) ||
-    (!(currentChar == SourceFile.EOT))) 
-    {
+    while((currentChar != '"')) 
+    {  
         if((currentChar=='\\'))
         {
             if(scanEscapeSequence() == Token.ERROR)
                 return Token.ERROR;
-        }
-        else
+        } 
+        else 
             takeIt(); //Qualquer outro simbolo que nao " e aceito para uma String
     }
     if(currentChar == '"')
@@ -606,9 +605,11 @@ public static void main(String args[])
     Scanner scanner = new Scanner(source);
     do{
         tok = scanner.scan();
-        System.out.println("Kind: "+tok.kind+" Spelling: "+tok.spelling); // Tirar essa linha depois
-        
+        System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
+    //    System.out.println("Kind: "+tok.kind+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois      
     }while(tok.kind != 56);
+   // for(int i = 0; i < 30 ; i++)
+             // System.out.println("Kind: "+Token.spellings[i]+i+" Spelling: "+tok.spelling); // Tirar essa linha depois      
     //tok = scanner.scan();
 //    System.out.print(token.spelling);
 
