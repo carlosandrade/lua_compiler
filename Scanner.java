@@ -2,6 +2,7 @@
 
 // scanSeparator skips a single separator.
 
+
 private void scanSeparator() {
   switch (currentChar) {
   case '!':
@@ -30,6 +31,7 @@ private boolean isLetter(char c) {
 */
 
 ///////////////////////////////////////////////////////////////////////////////
+
 
 public class Scanner{
     private char currentChar;
@@ -60,7 +62,7 @@ public Scanner(SourceFile source) {
 private void takeIt(){
     if(currentlyScanningToken)
         currentSpelling.append(currentChar);
-    currentChar = sourceFile.getSource()
+    currentChar = sourceFile.getSource();
     
 }
 
@@ -69,7 +71,7 @@ private void take (char expectedChar){
     {
         currentSpelling.append(currentChar);
         currentChar = sourceFile.getSource();
-    }else
+    }else{
         //report syntax error
     }
 }
@@ -223,13 +225,18 @@ private int scanToken()
             return Token.COMMA;        
         case '.':
             takeIt();
+            if(currentChar == '.')
+            {
+                takeIt();
+                if(currentChar == '.')
+                {
+                    takeIt();
+                    return Token.THREEDOTES;
+                }
+                else
+                    return Token.TWODOTES;
+            }
             return Token.DOT;
-        case '..': 
-          takeIt(); 
-          return Token.TWODOTES;
-        case '...': 
-            takeIt(); 
-            return Token.THREEDOTES;
         case SourceFile.EOT:
           return Token.EOT;
         default:
@@ -241,34 +248,59 @@ public Token scan(){
      Token tok;
       SourcePosition pos;
       int kind;
-
       currentlyScanningToken = false;
-      while (isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter())
-        scanSeparator();
-      currentlyScanningToken = true;
-      currentSpelling = new StringBuffer("");
-      pos = new SourcePosition();
-      pos.start = sourceFile.getCurrentLine();
-
-      kind = scanToken();
-
-      pos.finish = sourceFile.getCurrentLine();
-      tok = new Token(kind, currentSpelling.toString(), pos);
-      if (debug)
-        System.out.println(tok);
-      return tok;
+      //isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter()
+      while ((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C')||
+         (currentChar == '\r') || (currentChar == '\n') || (currentChar == '-'))
+     {
+        if((currentChar == '\r') || (currentChar == '\n'))
+            scanNewline();
+        else if((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C'))
+            scanWs();
+        else if(currentChar == '-')
+        {
+            takeIt();
+            if(currentChar == '-')
+            {
+                takeIt();
+                if(currentChar == '[')
+                {
+                    kind = scanComment();
+                    break;
+                }else{
+                    kind = scanLinecomment();
+                    break;
+                }
+            }else{    
+                kind = Token.MINUS;
+                break;
+            }
+        }
     }
-}
 
-}
 
+    currentlyScanningToken = true;
+    currentSpelling = new StringBuffer("");
+    pos = new SourcePosition();
+    pos.start = sourceFile.getCurrentLine();
+    if(kind != Token.MINUS)
+        kind = scanToken();
+    pos.finish = sourceFile.getCurrentLine();
+    tok = new Token(kind, currentSpelling.toString(), pos);
+    if (debug)
+        System.out.println(tok);
+      
+    
+    
+    return tok;
+}
 private int scanEscapeSequence()
 { int kind;
     take('\\');
     if((currentChar=='b') || (currentChar=='t') || (currentChar=='n') //Escapesequence
     || (currentChar=='f') || (currentChar=='r') || (currentChar=='"')
     || (currentChar=='\'') || (currentChar=='\\'))
-    {    takeIt(); return Token.OK;
+    {    takeIt(); return Token.OK;}
     else if((currentChar=='u')) //UnicodeEscape
     {
         takeIt();
@@ -349,8 +381,7 @@ private int scanLongstring()
         takeIt();
         contigual++;
     take('[');
-    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == ']')
-    || !(currentChar == SourceFile.EOT))
+    while((currentChar == '\\') || (!(currentChar == '\\')) || (!(currentChar == ']')) || (!(currentChar == SourceFile.EOT)))
     {
         scanEscapesequence();
     }
@@ -435,14 +466,12 @@ private int scanCharstring()
     }
     else
         return SourceFile.EOT;
-    }
-    
 }
 private int scanNormalstring()
 {
     take('"');
     //O or redundante em \\ e so para ficar legivel com a gramatica
-    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '"')) ||
+    while( (currentChar == '\\') || (!(currentChar == '\\')) || (!(currentChar == '"')) ||
     (!(currentChar == SourceFile.EOT))) 
     {
         if((currentChar=='\\'))
@@ -466,7 +495,7 @@ private boolean isNameStarter(char currentChar)
     if( (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
     (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f') ||
     (currentChar == 'g') || (currentChar == 'h') || (currentChar == 'i')
-    || (currentChar == 'j') || (currentChar == 'k') || (currentChar == 'l')
+    || (currentChar == 'j') || (currentChar == 'k') || (currentChar == 'l') ||
     (currentChar == 'm') || (currentChar == 'n') || (currentChar == 'o')
     || (currentChar == 'p') || (currentChar == 'q') || (currentChar == 'r')
     || (currentChar == 's') || (currentChar == 't') || (currentChar == 'u')
@@ -476,15 +505,15 @@ private boolean isNameStarter(char currentChar)
     || (currentChar == 'A') || (currentChar == 'B') || (currentChar == 'C')
     || (currentChar == 'D') || (currentChar == 'E') || (currentChar == 'F')
     || (currentChar == 'G') || (currentChar == 'H') || (currentChar == 'I')
-    || (currentChar == 'J') || (currentChar == 'K') (currentChar == 'L')
+    || (currentChar == 'J') || (currentChar == 'K') || (currentChar == 'L')
     || (currentChar == 'M') || (currentChar == 'N') || (currentChar == 'O')
     || (currentChar == 'P') || (currentChar == 'Q') || (currentChar == 'R')
     || (currentChar == 'S') || (currentChar == 'T') || (currentChar == 'U')
     || (currentChar == 'V') || (currentChar == 'W') || (currentChar == 'X')
     || (currentChar == 'Y') || (currentChar == 'Z') || (currentChar == '_'))
-    {return true}
+    {return true;}
     else
-        return false
+        return false;
 }
 private boolean isIntStarter(char currentChar)
 {
@@ -492,9 +521,9 @@ private boolean isIntStarter(char currentChar)
     (currentChar == '3') || (currentChar == '4') || (currentChar == '5') ||
     (currentChar == '6') || (currentChar == '7') || (currentChar == '8')    
     || (currentChar == '9'))
-    {return true}
+    {return true;}
     else
-        return false
+        return false;
 }
 private int scanHex()
 {
@@ -509,6 +538,7 @@ private int scanHex()
     (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f'))
         takeIt();
     return Token.HEX;
+}
 }
 
 /*

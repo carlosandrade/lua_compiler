@@ -131,6 +131,8 @@ class Token extends Object{
     // special tokens...
     EOT         =   38,
     ERROR       =   39;
+    NORMALSTRING = 40;
+    CHARSTRING = 41;
     
     
     // Spellings of different kinds of 
