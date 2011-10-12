@@ -55,11 +55,27 @@ public class SourceFile {
   int getCurrentLine() {
     return currentLine;
   }
+  
+  public static void main(String args[])
+  {
+      SourceFile sourceFile = new SourceFile("teste.txt");
+      char currentChar;
+      
+      currentChar = sourceFile.getSource();
+      if(currentChar == '"')
+        System.out.print("pegou \" ");
+      if(currentChar == '\\')
+        System.out.print("pegou \\ ");
+      currentChar = sourceFile.getSource();
+      System.out.print(currentChar);
+      if(currentChar == '\n')
+        System.out.print("pegou \\n ");
+      //System.out.print("Variavel lida:"+currentChar);
+      if(currentChar ==  '\'')
+        System.out.print("Pegou '");
+      if(currentChar == '\t')
+        System.out.print("Pegou \t");    
+      return;
+  }
 }
 
-int main()
-{
-    private SourceFile sourceFile;
-    
-    return 0;
-}

@@ -82,7 +82,12 @@ private int scanToken()
         return scanName();
     else if(isIntStarter(currentChar)) //Comeca a verificacao de ser INT, FLOAT ou EXP
     {
-        kind = scanInt(); //INT::= ('0'..'9')('0'..'9')*
+        takeIt(); //('0'..'9')
+        if(currentChar == 'x')
+            return scanHex(); //Starter de Hex '0x'
+        while(isIntStarter()) //('0'..'9')*
+            takeIt();
+        kind = Token.INT;
         if(currentChar == '.') //FLOAT::= INT '.' INT
         {
             takeIt();
@@ -110,18 +115,10 @@ private int scanToken()
                     return kind; //Token = Int, ou Token = Float
         }
     }
-    else if(isHexStarter(currentChar))//HEX::= '0x' ('0'..'9'| 'a'..'f')('0'..'9'| 'a'..'f')* ;
-        return scanHex();
-    else if(isNormalstringStarter(currentChar))
+    else if(currentChar == '\\')
         return scanNormalString();
-    else if(isCharStringStarter(currentChar))
+    else if(currentChar == '\'')
         return scanCharString();
-    else if(isLongStringStarter(currentChar))
-        return scanLongString();
-    else if(isCommentStarter(currentChar))
-        return scanComment();
-    else if(isLinecommentStarter(currentChar))
-        return scanLinecomment();
     else if(isWsStarter(currentChar))
         return scanWs();
     else if(isNewlineStarter(currentChar))
@@ -133,7 +130,16 @@ private int scanToken()
           return Token.PLUS;
         case '-':
           takeIt();
-          return Token.MINUS;
+          if(currentChar == '-')
+          {
+              takeIt();
+              if(currentChar == '[')
+                  return scanComment();
+              else
+                  return scanLinecomment();
+          }
+          else
+              return Token.MINUS;
         case '*': 
           takeIt();
           return Token.TIMES;
@@ -161,12 +167,33 @@ private int scanToken()
         case '>=':  
           takeIt();
           return Token.MOREOREQUALTHAN;
-        case '==':
+          /*como e feito um becomes da triangle, `:=` vamos precisar disso para as outras partes
+                  case ':':
+                    takeIt();
+                    if (currentChar == '=') {
+                      takeIt();
+                      return Token.BECOMES;
+                    } else
+                      return Token.COLON;
+          */
+        case '=':
           takeIt();
-          return Token.EQUALS;
-        case '~=':
+          if(currentChar == '=')
+          {
+              takeIt();
+              return Token.EQUALS;
+          }
+          else
+              return Token.BECOMES;
+        case '~':
           takeIt();
-          return Token.NOTEQUALS;
+          if(currentChar == '=')
+          {
+              takeIt();
+              return Token.NOTEQUALS;
+          }
+          else
+            return Token.ERROR;
         case 'and': 
           takeIt();
           return Token.AND;
@@ -182,15 +209,6 @@ private int scanToken()
         case '.':
           takeIt();
           return Token.DOT;
-/*como e feito um becomes da triangle, `:=` vamos precisar disso para as outras partes
-        case ':':
-          takeIt();
-          if (currentChar == '=') {
-            takeIt();
-            return Token.BECOMES;
-          } else
-            return Token.COLON;
-*/
         case ';':
           takeIt();
           return Token.SEMICOLON;
@@ -210,11 +228,12 @@ private int scanToken()
         case ')':
           takeIt();
           return Token.RPAREN;
-
         case '[':
           takeIt();
-          return Token.LBRACKET;
-
+          if(currentChar == '=')
+              return scanLongstring();
+          else
+              return Token.LBRACKET;
         case ']':
           takeIt();
           return Token.RBRACKET;
@@ -260,7 +279,205 @@ public Token scan(){
 
 }
 
+private int scanEscapeSequence()
+{ int kind;
+    take('\\');
+    if((currentChar=='b') || (currentChar=='t') || (currentChar=='n') //Escapesequence
+    || (currentChar=='f') || (currentChar=='r') || (currentChar=='"')
+    || (currentChar=='\'') || (currentChar=='\\'))
+    {    takeIt(); return Token.OK;
+    else if((currentChar=='u')) //UnicodeEscape
+    {
+        takeIt();
+        if((currentChar=='0') || (currentChar=='1') || (currentChar=='2') //HexDigit
+        || (currentChar=='3') || (currentChar=='4') || (currentChar=='5') 
+        || (currentChar=='6') || (currentChar=='7') || (currentChar=='8')
+        || (currentChar=='9') || (currentChar=='a') || (currentChar=='b')
+        || (currentChar=='c') || (currentChar=='d') || (currentChar=='e')
+        || (currentChar=='f') || (currentChar=='A') || (currentChar=='B')
+        || (currentChar=='C') || (currentChar=='D') || (currentChar=='E')
+        || (currentChar=='F'))
+        {
+            takeIt();
+            if((currentChar=='0') || (currentChar=='1') || (currentChar=='2') 
+            || (currentChar=='3') || (currentChar=='4') || (currentChar=='5') 
+            || (currentChar=='6') || (currentChar=='7') || (currentChar=='8')
+            || (currentChar=='9') || (currentChar=='a') || (currentChar=='b')
+            || (currentChar=='c') || (currentChar=='d') || (currentChar=='e')
+            || (currentChar=='f') || (currentChar=='A') || (currentChar=='B')
+            || (currentChar=='C') || (currentChar=='D') || (currentChar=='E')
+            || (currentChar=='F'))
+            {    
+                takeIt();
+                if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+                || (currentChar=='3') || (currentChar=='4') || (currentChar=='5') 
+                || (currentChar=='6') || (currentChar=='7') || (currentChar=='8')
+                || (currentChar=='9') || (currentChar=='a') || (currentChar=='b')
+                || (currentChar=='c') || (currentChar=='d') || (currentChar=='e')
+                || (currentChar=='f') || (currentChar=='A') || (currentChar=='B')
+                || (currentChar=='C') || (currentChar=='D') || (currentChar=='E')
+                || (currentChar=='F'))
+                {
+                    takeIt();
+                    if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+                    || (currentChar=='3') || (currentChar=='4') || (currentChar=='5') 
+                    || (currentChar=='6') || (currentChar=='7') || (currentChar=='8')
+                    || (currentChar=='9') || (currentChar=='a') || (currentChar=='b')
+                    || (currentChar=='c') || (currentChar=='d') || (currentChar=='e')
+                    || (currentChar=='f') || (currentChar=='A') || (currentChar=='B')
+                    || (currentChar=='C') || (currentChar=='D') || (currentChar=='E')
+                    || (currentChar=='F'))
+                    {
+                        takeIt();
+                        return Token.OK;
+                    }else
+                        return Token.ERROR;
+                }else
+                    return Token.ERROR;
+            }else
+            return Token.ERROR;
+        }else
+            return Token.ERROR;   
+    }//Octalescape, as 3 alternancias tem esse intervalo em comum
+    else if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+    || (currentChar=='3') || (currentChar=='4') || (currentChar=='5') 
+    || (currentChar=='6') || (currentChar=='7')) 
+    {
+        kind = Token.ERROR;
+        if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+        || (currentChar=='3'))
+        {    takeIt(); kind = Token.OK; }
+        if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+        || (currentChar=='3') ||(currentChar=='4') || (currentChar=='5') || (currentChar=='6')
+        || (currentChar=='7')) // ('0'..'7') || ('0'..'7') ('0'..'7')
+        {    takeIt(); kind = Token.OK; }
+        if((currentChar=='0') || (currentChar=='1') || (currentChar=='2')
+        || (currentChar=='3') ||(currentChar=='4') || (currentChar=='5') || (currentChar=='6')
+        || (currentChar=='7')) // ('0'..'7') || ('0'..'7') ('0'..'7')
+        {    takeIt(); kind = Token.OK; }
+        return kind;
+    }else
+        return Token.ERROR;    
+}
+private int scanLongstring()
+{int contigual = 0;
+    //Neste ponto ja verificou que esta usando colchete e ja aceitou para diferenciar em scanToken() o =
+    while(currentChar == '=')
+        takeIt();
+        contigual++;
+    take('[');
+    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == ']')
+    || !(currentChar == Token.EOT))
+    {
+        scanEscapesequence();
+    }
+    if(currentChar == ']')
+        takeIt();
+    else if(currentchar == Token.EOT)
+        return Token.ERROR;
+    while((currentChar == '=') && (contigual > 0))
+    {
+        takeIt();
+        count--;
+    }
+    if(count!=0)
+        return Token.ERROR;
+    take(']');
+    return Token.LONGSTRING;
+}
 
+private int scanComment()
+{
+    take('[');
+    take('[');
+    while(!(currentChar == Token.EOT)) //Existe uma condicao de parada do ']]' dentro tambem
+    {
+        if(currentChar == ']')
+        {
+            takeIt();
+            if(currentChar == ']')
+            {
+                takeIt();
+                return Token.COMMENT;
+            }
+            else
+                takeIt();
+        }
+        else
+            takeIt();
+    }
+    if(currentChar == Token.EOT)
+        return Token.ERROR;
+}
+private int scanWs()
+{
+    if(currentChar == ' ')
+        takeIt();
+    if(currentChar == '\t')
+        takeIt();
+    if(currentCHar == '\u000C')
+        takeIt();
+}
+private int scanNewline()
+{
+    if(currentChar == '\r')
+        takeIt();
+    take('\n');
+}
+private int scanLinecomment()
+{ //Neste ponto os -- ja foram lidos para diferenciar entre linecomment e comment
+    while((!(currentChar == Token.EOT)) || (!(currentChar == '\n')) || 
+    (!(currentChar == '\r'))) 
+        takeIt();
+    if(currentChar == '\r')
+        takeIt();
+    if(currentChar == '\n')
+        takeIt();
+    if(currentChar == Token.EOT)
+        return Token.ERROR;
+}
+private int scanCharstring()
+{
+    //O or redundante em \\ e so para ficar legivel com a gramatica
+    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '\'')) ||
+    (!(currentChar == Token.EOT)))
+    {
+        if(scanEscapeSequence() == Token.ERROR)
+            return Token.ERROR;        
+    }
+    if(currentChar == '\'')
+    {
+        takeIt();
+        return Token.CHARSTRING;
+    }
+    else
+        return Token.EOT;
+    }
+    
+}
+private int scanNormalstring()
+{
+    take('"');
+    //O or redundante em \\ e so para ficar legivel com a gramatica
+    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '"')) ||
+    (!(currentChar == Token.EOT))) 
+    {
+        if((currentChar=='\\'))
+        {
+            if(scanEscapeSequence() == Token.ERROR)
+                return Token.ERROR;
+        }
+        else
+            takeIt(); //Qualquer outro simbolo que nao " e aceito para uma String
+    }
+    if(currentChar == '"')
+    {
+        takeIt();
+        return Token.NORMALSTRING;
+    }
+    else
+        return Token.EOT;
+}
 private boolean isNameStarter(char currentChar)
 {
     if( (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
@@ -296,9 +513,19 @@ private boolean isIntStarter(char currentChar)
     else
         return false
 }
-private boolean isHexStarter(char currentChar)
+private int scanHex()
 {
-    
+    //Ja teve que aceitar 0 para diferenciar numero de hex que e 0x
+    take('x');
+    if(isIntStarter() || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
+    (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f'))
+        takeIt();
+    else
+        return Token.ERROR;
+    while(isIntStarter() || (currentChar == 'a') || (currentChar == 'b') || (currentChar == 'c') || 
+    (currentChar == 'd') || (currentChar == 'e') || (currentChar == 'f'))
+        takeIt();
+    return Token.HEX;
 }
 
 /*
