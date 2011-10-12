@@ -1,0 +1,15 @@
+number: int | float | exp | hex;
+	int
+	float
+	exp
+	hex
+string : normalstring | charstring | longstring
+
+
+Ws ok
+Newline ok
+Comment ok
+LineComment ok
+long string ok 
+
+

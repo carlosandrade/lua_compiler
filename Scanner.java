@@ -119,9 +119,9 @@ private int scanToken()
         return scanNormalString();
     else if(currentChar == '\'')
         return scanCharString();
-    else if(isWsStarter(currentChar))
+    else if((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C'))
         return scanWs();
-    else if(isNewlineStarter(currentChar))
+    else if((currentChar == '\r') || (currentChar == '\n'))
         return scanNewline();
     switch(currentChar)
     {
@@ -141,114 +141,97 @@ private int scanToken()
           else
               return Token.MINUS;
         case '*': 
-          takeIt();
-          return Token.TIMES;
+            takeIt();
+            return Token.TIMES;
         case '/':  
-          takeIt();
-          return Token.RBAR;
-        case '^':
-          takeIt();
-          return Token.CHAPEU;
+            takeIt();
+            return Token.RBAR;
         case '%':  
-          takeIt();
-          return Token.PERCENT;
+           takeIt();
+           return Token.PERCENT;
+        case '^':
+            takeIt();
+            return Token.CHAPEU;
+        case '#':
+            takeIt();
+            return Token.VELHA;
+        case '=':
+            takeIt();
+            if(currentChar == '=')
+            {
+                takeIt();
+                return Token.EQUALS;
+             }
+             else
+                return Token.BECOMES;
+        case '~':
+            takeIt();
+            if(currentChar == '=')
+            {
+                takeIt();
+                  return Token.NOTEQUALS;
+              }
+              else
+                return Token.ERROR;
+        case '<':  
+            takeIt();
+            if(currentChar == '=')
+            {
+                takeIt();
+                return Token.LESSOREQUALTHAN;
+             }   
+             else
+                return Token.LESSTHAN;
+        case '>':
+             takeIt();
+             if(currentChar == '=')
+             {
+                 takeIt();
+                 return Token.MOREOREQUALTHAN;
+             }
+             else
+                return Token.MORETHAN;
+        case '(':
+                takeIt();
+                return Token.LPAREN;
+        case ')':
+                takeIt();
+                return Token.RPAREN;
+        case '{':
+                takeIt();
+                return Token.LCURLY;
+        case '}':
+                takeIt();
+                return Token.RCURLY;
+        case '[':
+                takeIt();
+                if(currentChar == '=')
+                    return scanLongstring();
+                    else
+                        return Token.LBRACKET;
+        case ']':
+            takeIt();
+            return Token.RBRACKET;
+        case ';':
+            takeIt();
+            return Token.SEMICOLON;
+        case ':':
+            takeIt();
+            return Token.COLON;
+        case ',':
+            takeIt();
+            return Token.COMMA;        
+        case '.':
+            takeIt();
+            return Token.DOT;
         case '..': 
           takeIt(); 
           return Token.TWODOTES;
-        case '<':  
-          takeIt();
-          return Token.LESSTHAN;
-        case '<=':  
-          takeIt();
-          return Token.LESSOREQUALTHAN;
-        case '>':
-          takeIt();
-          return Token.MORETHAN;
-        case '>=':  
-          takeIt();
-          return Token.MOREOREQUALTHAN;
-          /*como e feito um becomes da triangle, `:=` vamos precisar disso para as outras partes
-                  case ':':
-                    takeIt();
-                    if (currentChar == '=') {
-                      takeIt();
-                      return Token.BECOMES;
-                    } else
-                      return Token.COLON;
-          */
-        case '=':
-          takeIt();
-          if(currentChar == '=')
-          {
-              takeIt();
-              return Token.EQUALS;
-          }
-          else
-              return Token.BECOMES;
-        case '~':
-          takeIt();
-          if(currentChar == '=')
-          {
-              takeIt();
-              return Token.NOTEQUALS;
-          }
-          else
-            return Token.ERROR;
-        case 'and': 
-          takeIt();
-          return Token.AND;
-        case 'or':
-          takeIt();
-          return Token.OR;
-        case 'not':
-          takeit();
-          return Token.NOT;
-        case '#':
-          takeIt();
-          return Token.VELHA;
-        case '.':
-          takeIt();
-          return Token.DOT;
-        case ';':
-          takeIt();
-          return Token.SEMICOLON;
-
-        case ',':
-          takeIt();
-          return Token.COMMA;
-
-        case '~':
-          takeIt();
-          return Token.IS;
-
-        case '(':
-          takeIt();
-          return Token.LPAREN;
-
-        case ')':
-          takeIt();
-          return Token.RPAREN;
-        case '[':
-          takeIt();
-          if(currentChar == '=')
-              return scanLongstring();
-          else
-              return Token.LBRACKET;
-        case ']':
-          takeIt();
-          return Token.RBRACKET;
-
-        case '{':
-          takeIt();
-          return Token.LCURLY;
-
-        case '}':
-          takeIt();
-          return Token.RCURLY;
-
+        case '...': 
+            takeIt(); 
+            return Token.THREEDOTES;
         case SourceFile.EOT:
           return Token.EOT;
-
         default:
           takeIt();
           return Token.ERROR;  
@@ -367,13 +350,13 @@ private int scanLongstring()
         contigual++;
     take('[');
     while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == ']')
-    || !(currentChar == Token.EOT))
+    || !(currentChar == SourceFile.EOT))
     {
         scanEscapesequence();
     }
     if(currentChar == ']')
         takeIt();
-    else if(currentchar == Token.EOT)
+    else if(currentchar == SourceFile.EOT)
         return Token.ERROR;
     while((currentChar == '=') && (contigual > 0))
     {
@@ -390,7 +373,7 @@ private int scanComment()
 {
     take('[');
     take('[');
-    while(!(currentChar == Token.EOT)) //Existe uma condicao de parada do ']]' dentro tambem
+    while(!(currentChar == SourceFile.EOT)) //Existe uma condicao de parada do ']]' dentro tambem
     {
         if(currentChar == ']')
         {
@@ -406,7 +389,7 @@ private int scanComment()
         else
             takeIt();
     }
-    if(currentChar == Token.EOT)
+    if(currentChar == SourceFile.EOT)
         return Token.ERROR;
 }
 private int scanWs()
@@ -426,23 +409,23 @@ private int scanNewline()
 }
 private int scanLinecomment()
 { //Neste ponto os -- ja foram lidos para diferenciar entre linecomment e comment
-    while((!(currentChar == Token.EOT)) || (!(currentChar == '\n')) || 
+    while((!(currentChar == SourceFile.EOT)) || (!(currentChar == '\n')) || 
     (!(currentChar == '\r'))) 
         takeIt();
     if(currentChar == '\r')
         takeIt();
     if(currentChar == '\n')
         takeIt();
-    if(currentChar == Token.EOT)
+    if(currentChar == SourceFile.EOT)
         return Token.ERROR;
 }
 private int scanCharstring()
 {
     //O or redundante em \\ e so para ficar legivel com a gramatica
     while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '\'')) ||
-    (!(currentChar == Token.EOT)))
+    (!(currentChar == SourceFile.EOT)))
     {
-        if(scanEscapeSequence() == Token.ERROR)
+        if(scanEscapeSequence() == SourceFile.ERROR)
             return Token.ERROR;        
     }
     if(currentChar == '\'')
@@ -451,7 +434,7 @@ private int scanCharstring()
         return Token.CHARSTRING;
     }
     else
-        return Token.EOT;
+        return SourceFile.EOT;
     }
     
 }
@@ -460,7 +443,7 @@ private int scanNormalstring()
     take('"');
     //O or redundante em \\ e so para ficar legivel com a gramatica
     while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '"')) ||
-    (!(currentChar == Token.EOT))) 
+    (!(currentChar == SourceFile.EOT))) 
     {
         if((currentChar=='\\'))
         {
