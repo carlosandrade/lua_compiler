@@ -1,1 +1,2 @@
-io.write("Helloworld,from",_VERSION,"!").
+aa --bla
+a = [==[alo123"]==]

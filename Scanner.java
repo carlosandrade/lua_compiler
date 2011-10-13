@@ -245,10 +245,15 @@ public Token scan(){
       SourcePosition pos;
       int kind = -1;
       currentlyScanningToken = false;
+      
+           
+      
       //isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter()
       while ((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C')||
          (currentChar == '\r') || (currentChar == '\n') || (currentChar == '-'))
      {
+         //System.out.println(currentChar);
+         
         if((currentChar == '\r') || (currentChar == '\n'))
             scanNewline();
         else if((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C'))
@@ -371,44 +376,56 @@ private int scanEscapeSequence()
         return Token.ERROR;    
 }
 private int scanLongstring()
-{int count = 0;
+{int count = 0, countaux = 0;
     //Neste ponto ja verificou que esta usando colchete e ja aceitou para diferenciar em scanToken() o =
     while(currentChar == '=')
         takeIt();
         count++;
     take('[');
-    while((currentChar == '\\') || (!(currentChar == '\\')) || (!(currentChar == ']')) || (!(currentChar == SourceFile.EOT)))
+    while(currentChar != SourceFile.EOT) //A condicao de parada de encontrar colchete fechando de mesmo nivel e aceitar o resto esta dentro
     {
+        if(currentChar == ']')
+        {
+            takeIt();
+            countaux = count;
+            while(countaux > 0)
+            {
+                if(currentChar == '=')
+                {
+                    takeIt();
+                    countaux--;
+                }
+                else
+                    break; //Nivel de comentario e menor que o necessario para fechar o bloco de comentario
+            }
+            if((countaux == 0) && (currentChar == ']')) //Se nao entrar nessa condicao o nivel de parenteses nao e o mesmo do de abertura
+            {
+                takeIt();
+                return Token.LONGSTRING;
+            }
+            else
+                takeIt(); //Se nao esta fechando 
+        }
         if(scanEscapeSequence() == Token.ERROR)
             return Token.ERROR;
     }
-    if(currentChar == ']')
-        takeIt();
-    else if(currentChar == SourceFile.EOT)
-        return Token.ERROR;
-    while((currentChar == '=') && (count > 0))
-    {
-        takeIt();
-        count--;
-    }
-    if(count!=0)
-        return Token.ERROR;
-    take(']');
-    return Token.LONGSTRING;
+    return Token.ERROR; //entao o loop chegou ao fim do arquivo sem identificar o fechamento de long string
 }
 
 private int scanComment()
-{
+{boolean foundDoubleRightBrackets = false;
     take('[');
     take('[');
-    while(!(currentChar == SourceFile.EOT)) //Existe uma condicao de parada do ']]' dentro tambem
+    while(!((foundDoubleRightBrackets) || (currentChar == SourceFile.EOT))) //Existe uma condicao de parada do ']]' dentro tambem
     {
+        System.out.print(currentChar);
         if(currentChar == ']')
         {
             takeIt();
             if(currentChar == ']')
             {
                 takeIt();
+                foundDoubleRightBrackets = true;
                 return Token.OK;
             }
             else
@@ -419,7 +436,7 @@ private int scanComment()
     }
     if(currentChar == SourceFile.EOT)
         return Token.ERROR;
-    return Token.ERROR;
+    return Token.OK; //Comentarios nao sao tokens
 }
 private int scanWs()
 {
@@ -439,7 +456,8 @@ private int scanWs()
         return Token.OK;
     }
     else
-        return Token.ERROR;
+        return Token.ERROR; //Se esse metodo foi chamado entao alguns dos starters acima devem ter ocorrido, se entrou
+        //neste metodo de outro local deve ser sinalizado um erro
 }
 private int scanNewline()
 {
@@ -450,25 +468,29 @@ private int scanNewline()
 }
 private int scanLinecomment()
 { //Neste ponto os -- ja foram lidos para diferenciar entre linecomment e comment
-    while((!(currentChar == SourceFile.EOT)) || (!(currentChar == '\n')) || 
-    (!(currentChar == '\r'))) 
+    while (!((currentChar == '\n') || (currentChar == '\r') || (currentChar == SourceFile.EOT)))
         takeIt();
     if(currentChar == '\r')
         takeIt();
     if(currentChar == '\n')
         takeIt();
     if(currentChar == SourceFile.EOT)
-        return Token.ERROR;
-    return Token.ERROR;
+        return Token.EOT;
+    else
+        return Token.OK; //Comentario de linha nao e token
 }
 private int scanCharstring()
 {
-    //O or redundante em \\ e so para ficar legivel com a gramatica
-    while(currentChar == '\\' || (!(currentChar == '\\')) || (!(currentChar == '\'')) ||
-    (!(currentChar == SourceFile.EOT)))
+    take('\'');
+    while(!((currentChar == '\'') || (currentChar == SourceFile.EOT )))
     {
-        if(scanEscapeSequence() == Token.ERROR)
-            return Token.ERROR;        
+        if(currentChar=='\\')
+        {
+            if(scanEscapeSequence() == Token.ERROR)
+                return Token.ERROR;   
+        }
+        else
+            takeIt(); //Qualquer outro simbolo que nao e ' e aceito para uma String
     }
     if(currentChar == '\'')
     {
@@ -476,15 +498,15 @@ private int scanCharstring()
         return Token.CHARSTRING;
     }
     else
-        return SourceFile.EOT;
+        return Token.ERROR; //Abriu string e chegou ao fim do arquivo sem fechar a string com aspas simples
 }
 private int scanNormalstring()
 {
     take('"');
     //O or redundante em \\ e so para ficar legivel com a gramatica
-    while((currentChar != '"')) 
+    while(!((currentChar == '"') || (currentChar == SourceFile.EOT))) 
     {  
-        if((currentChar=='\\'))
+        if(currentChar=='\\')
         {
             if(scanEscapeSequence() == Token.ERROR)
                 return Token.ERROR;
@@ -498,7 +520,7 @@ private int scanNormalstring()
         return Token.NORMALSTRING;
     }
     else
-        return Token.EOT;
+        return Token.ERROR; //Abriu string e chegou ao fim do arquivo sem fechar a string com aspas simples
 }
 private boolean isNameStarter(char currentChar)
 {
