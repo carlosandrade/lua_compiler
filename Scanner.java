@@ -286,9 +286,11 @@ public Token scan(){
     pos.start = sourceFile.getCurrentLine();
     if(kind != Token.MINUS)
         kind = scanToken();
+    else
+        currentSpelling.append('-');
     //System.out.println("Testando"); // Tirar essa linha depois//Tirar essa linha depois
     pos.finish = sourceFile.getCurrentLine();
-    tok = new Token(kind, currentSpelling.toString());
+    tok = new Token(kind, currentSpelling.toString(),pos);
     //System.out.println("Kind: "+tok.kind+" Spelling: "+tok.spelling); // Tirar essa linha depois
 //    if (debug)
 //        System.out.println(tok);
@@ -639,11 +641,13 @@ public static void main(String args[])
         tok = scanner.scan();
         if(tok.kind == Token.ERROR)
         {
-            System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
+            //System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
+            System.out.println(tok);
             System.exit(0);
         }
         if(tok.kind != Token.EOT)
-            System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
+            System.out.println(tok);
+            //System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
     //    System.out.println("Kind: "+tok.kind+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois      
     }while(tok.kind != Token.EOT);
    // for(int i = 0; i < 30 ; i++)

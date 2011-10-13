@@ -58,11 +58,13 @@
 class Token extends Object{
     public int kind;
     public String spelling;
+    public SourcePosition position;
      
-    public Token (int kind, String spelling)
+    public Token (int kind, String spelling, SourcePosition position)
     {
         this.kind = kind;
         this.spelling = spelling;
+        this.position = position;
         //If kind is NAME(IDENTIFIER) and spelling matches one of the keywords,
         //change the token's kind accordingly:
 
@@ -221,5 +223,11 @@ class Token extends Object{
         "while",
         "",
          "<error>"
-     };      
+     }; 
+     
+     public String toString() {
+       return " Kind=" + spellings[kind] + "\t spelling=" + spelling +
+         "\t position=" + position;
+     }
+          
 }
