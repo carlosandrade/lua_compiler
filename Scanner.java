@@ -379,8 +379,10 @@ private int scanLongstring()
 {int count = 0, countaux = 0;
     //Neste ponto ja verificou que esta usando colchete e ja aceitou para diferenciar em scanToken() o =
     while(currentChar == '=')
+    {
         takeIt();
         count++;
+    }
     take('[');
     while(currentChar != SourceFile.EOT) //A condicao de parada de encontrar colchete fechando de mesmo nivel e aceitar o resto esta dentro
     {
@@ -401,15 +403,23 @@ private int scanLongstring()
             if((countaux == 0) && (currentChar == ']')) //Se nao entrar nessa condicao o nivel de parenteses nao e o mesmo do de abertura
             {
                 takeIt();
+                
+                
                 return Token.LONGSTRING;
             }
             else
                 takeIt(); //Se nao esta fechando 
         }
-        if(scanEscapeSequence() == Token.ERROR)
-            return Token.ERROR;
+        
+        else if(currentChar=='\\')
+        {
+            if(scanEscapeSequence() == Token.ERROR)
+                return Token.ERROR;
+        } 
+        else 
+            takeIt(); //entao e uma letra qualquer que pertence a long string
     }
-    return Token.ERROR; //entao o loop chegou ao fim do arquivo sem identificar o fechamento de long string
+    return Token.ERROR; //Chegou ao fim do arquivo sem fechar string longa, retorne erro
 }
 
 private int scanComment()
