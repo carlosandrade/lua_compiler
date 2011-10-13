@@ -637,6 +637,11 @@ public static void main(String args[])
     Scanner scanner = new Scanner(source);
     do{
         tok = scanner.scan();
+        if(tok.kind == Token.ERROR)
+        {
+            System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
+            System.exit(0);
+        }
         if(tok.kind != Token.EOT)
             System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
     //    System.out.println("Kind: "+tok.kind+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois      
