@@ -406,9 +406,7 @@ private int scanLongstring()
                 
                 
                 return Token.LONGSTRING;
-            }
-            else
-                takeIt(); //Se nao esta fechando 
+            } 
         }
         
         else if(currentChar=='\\')
