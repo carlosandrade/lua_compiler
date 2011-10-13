@@ -1,6 +1,23 @@
-Ex1:
+Ex1 -- Fechamento com maior nivel seguido de nivel igual (deve imprimir o pedaco de maior nivel e aceitar longstring):
 
 -- hello.lua
 -- the first program in every language
 
 io.write([==[bla]===]]==])
+
+Ex2 -- Fechamento com nivel menor seguido de fechamento correto
+
+-- hello.lua
+-- the first program in every language
+
+io.write([==[bla]]]==])
+
+Ex3:
+
+Um exemplo mais macabro:
+
+-- hello.lua
+-- the first program in every language
+io.write([==[bla]=adsc]asdscxsc]]]==])
+
+

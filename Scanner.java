@@ -61,13 +61,15 @@ private void takeIt(){
 }
 
 private void take (char expectedChar){
-    if (currentChar == expectedChar)
+    
+    if(currentlyScanningToken)
     {
-        currentSpelling.append(currentChar);
-        currentChar = sourceFile.getSource();
-    }else{
-        //report syntax error
+        if (currentChar == expectedChar)
+        {
+            currentSpelling.append(currentChar);
+        }
     }
+    currentChar = sourceFile.getSource();   
 }
 
 //erros sao definidos aqui em producoes que nao foram modularizadas e nos metodos que foram construidos
