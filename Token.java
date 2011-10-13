@@ -226,8 +226,8 @@ class Token extends Object{
      }; 
      
      public String toString() {
-       return " Kind=" + spellings[kind] + "\t spelling=" + spelling +
-         "\t position=" + position;
+       return "Kind:\t" + spellings[kind] + "\t\tspelling:\t" + spelling +
+         "\tposition:\t" + position;
      }
           
 }

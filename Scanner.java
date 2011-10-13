@@ -430,7 +430,6 @@ private int scanComment()
     take('[');
     while(!((foundDoubleRightBrackets) || (currentChar == SourceFile.EOT))) //Existe uma condicao de parada do ']]' dentro tambem
     {
-        System.out.print(currentChar);
         if(currentChar == ']')
         {
             takeIt();

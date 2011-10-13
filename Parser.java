@@ -69,7 +69,8 @@ void accept (int tokenExpected)
 
 void acceptIt()
 {
-    currentToken = scanner.scan();
+    System.out.println(currentToken);
+    currentToken = scanner.scan();  
 }
 
 //In√≠cio dos m√©todos parsing
@@ -1195,17 +1196,20 @@ private void dummy() {}
 
 public static void main (String args[])
 {
-    Token token;    
+//    Token token;    
     Parser parser = new Parser();
     SourceFile source = new SourceFile("teste.txt");
-    Scanner scanner = new Scanner(source);
+    parser.scanner = new Scanner(source);
 
     do {
-        token = scanner.scan();
+        parser.currentToken = parser.scanner.scan();
+        if(parser.currentToken == null)
+            System.out.println("vazio");
+        System.out.println(parser.currentToken);
         parser.parseChunk();
 
 
-    }while(token.kind != Token.EOT);
+    }while(parser.currentToken.kind != Token.EOT);
 
 }
 
