@@ -1,32 +1,3 @@
-/*
-
-// scanSeparator skips a single separator.
-
-
-private void scanSeparator() {
-  switch (currentChar) {
-  case '!':
-    {
-      takeIt();
-      while ((currentChar != SourceFile.EOL) && (currentChar != SourceFile.EOT))
-        takeIt();
-      if (currentChar == SourceFile.EOL)
-        takeIt();
-    }
-    break;
-
-  case ' ': case '\n': case '\r': case '\t':
-    takeIt();
-    break;
-  }
-}
-
-
-*/
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 public class Scanner{
     private char currentChar;
     
@@ -128,17 +99,6 @@ private int scanToken()
           return Token.PLUS;
         case '-':
           takeIt();
-/*
-          if(currentChar == '-')
-          {
-              takeIt();
-              if(currentChar == '[')
-                  return scanComment();
-              else
-                  return scanLinecomment();
-          }
-          else
-          */
               return Token.MINUS;
         case '*': 
             takeIt();
@@ -248,13 +208,10 @@ public Token scan(){
       int kind = -1;
       currentlyScanningToken = false;
       
-           
-      
       //isWsStarter(currentChar) || isNewlineStarter() || isCommentStarter() || isLinecommentStarter()
       while ((currentChar == ' ') || (currentChar == '\t') || (currentChar == '\u000C')||
          (currentChar == '\r') || (currentChar == '\n') || (currentChar == '-'))
      {
-         //System.out.println(currentChar);
          
         if((currentChar == '\r') || (currentChar == '\n'))
             scanNewline();
@@ -278,8 +235,6 @@ public Token scan(){
             }
         }
     }
-
-
     currentlyScanningToken = true;
     currentSpelling = new StringBuffer("");
     pos = new SourcePosition();
@@ -288,15 +243,9 @@ public Token scan(){
         kind = scanToken();
     else
         currentSpelling.append('-');
-    //System.out.println("Testando"); // Tirar essa linha depois//Tirar essa linha depois
     pos.finish = sourceFile.getCurrentLine();
     tok = new Token(kind, currentSpelling.toString(),pos);
-    //System.out.println("Kind: "+tok.kind+" Spelling: "+tok.spelling); // Tirar essa linha depois
-//    if (debug)
-//        System.out.println(tok);
-      
-    
-    
+        
     return tok;
 }
 private int scanEscapeSequence()
@@ -585,20 +534,6 @@ private int scanHex()
 }
 
 private int scanName(){ 
-/*    switch (currentChar) 
-    {
-        case 'a':  case 'b':  case 'c':  case 'd':  case 'e':
-        case 'f':  case 'g':  case 'h':  case 'i':  case 'j':
-        case 'k':  case 'l':  case 'm':  case 'n':  case 'o':
-        case 'p':  case 'q':  case 'r':  case 's':  case 't':
-        case 'u':  case 'v':  case 'w':  case 'x':  case 'y':
-        case 'z':
-        case 'A':  case 'B':  case 'C':  case 'D':  case 'E':
-        case 'F':  case 'G':  case 'H':  case 'I':  case 'J':
-        case 'K':  case 'L':  case 'M':  case 'N':  case 'O':
-        case 'P':  case 'Q':  case 'R':  case 'S':  case 'T':
-        case 'U':  case 'V':  case 'W':  case 'X':  case 'Y':
-        case 'Z':  case '_': */
         if(isLetter(currentChar))
             takeIt();
         else
@@ -607,10 +542,6 @@ private int scanName(){
         while (isLetter(currentChar) || isInt(currentChar))
             takeIt();
         return Token.NAME; 
-  /*      default:
-            takeIt();
-            return Token.ERROR; 
-    }*/
 }
 private boolean isInt(char c) {
   return (c >= '0' && c <= '9');
@@ -630,8 +561,6 @@ private int scanInt(){
         takeIt();
     return Token.INT;
 }
-
-
 public static void main(String args[])
 {
     Token tok;
@@ -641,60 +570,11 @@ public static void main(String args[])
         tok = scanner.scan();
         if(tok.kind == Token.ERROR)
         {
-            //System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
             System.out.println(tok);
             System.exit(0);
         }
         if(tok.kind != Token.EOT)
             System.out.println(tok);
-            //System.out.println("Kind: "+Token.spellings[tok.kind]+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois
-    //    System.out.println("Kind: "+tok.kind+" "+" Spelling: "+tok.spelling); // Tirar essa linha depois      
     }while(tok.kind != Token.EOT);
-   // for(int i = 0; i < 30 ; i++)
-             // System.out.println("Kind: "+Token.spellings[i]+i+" Spelling: "+tok.spelling); // Tirar essa linha depois      
-    //tok = scanner.scan();
-//    System.out.print(token.spelling);
-
 }
-
 }
-
-
-
-/*
-
-
-private int scanInt(){ 
-    switch(currentChar)
-    {
-        case '0':  case '1':  case '2':  case '3':  case '4':
-        case '5':  case '6':  case '7':  case '8':  case '9':
-            takeIt();
-    }
-    while (isInt(currentChar))
-        takeIt();
-}
-        if(currentChar != '.')
-            return Token.INT;
-        else
-        {
-            case '0':  case '1':  case '2':  case '3':  case '4':
-            case '5':  case '6':  case '7':  case '8':  case '9':
-                takeIt();
-                while (isDigit(currentChar))
-                  takeIt();
-                return Token.FLOAT;
-        }
-            
-        
-        
-
-
-      }
-    }
-
-}
-
-
-}
-*/
