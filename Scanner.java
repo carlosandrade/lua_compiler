@@ -1,3 +1,4 @@
+import java.io.*;
 public class Scanner{
     private char currentChar;
     
@@ -563,6 +564,8 @@ private int scanInt(){
 }
 public static void main(String args[])
 {
+    
+    /*
     Token tok;
     SourceFile source = new SourceFile("entradas.txt");
     Scanner scanner = new Scanner(source);
@@ -576,5 +579,28 @@ public static void main(String args[])
         if(tok.kind != Token.EOT)
             System.out.println(tok);
     }while(tok.kind != Token.EOT);
+    */
+try{
+        FileWriter fstream = new FileWriter("tokens.txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        Token tok;
+        SourceFile source = new SourceFile("teste.txt");
+        Scanner scanner = new Scanner(source);
+        do{
+            tok = scanner.scan();
+            if(tok.kind == Token.ERROR)
+            {
+                out.write(tok.toString());
+                System.exit(0);
+            }
+            if(tok.kind != Token.EOT)
+                out.write(tok.toString());
+        }while(tok.kind != Token.EOT);           
+        out.close();
+        
+}catch (Exception e){//Catch exception if any
+        System.err.println("Error: " + e.getMessage());
+        } 
+
 }
 }

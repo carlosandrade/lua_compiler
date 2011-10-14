@@ -1,11 +1,12 @@
 public class Parser {
 
 private int flag;
+public boolean error = false;
 private Token currentToken;
 private Scanner scanner; 
 private SourcePosition previousTokenPosition = new SourcePosition();
 
-//m√©todos starters
+//m‚àö¬©todos starters
 
 private boolean statStarters()
 {
@@ -57,7 +58,7 @@ private boolean auxiliarStarters()
 }
 
 
-//m√©todos accept e acceptIt
+//m‚àö¬©todos accept e acceptIt
 
 void accept (int tokenExpected)
 {
@@ -67,16 +68,15 @@ void accept (int tokenExpected)
         currentToken = scanner.scan();
     }
     else
-        System.out.println("PARSER REJECT");
+        error = true;
 }
 
 void acceptIt()
 {
-    System.out.println(currentToken);
     currentToken = scanner.scan();  
 }
 
-//In√≠cio dos m√©todos parsing
+//In‚àö‚â†cio dos m‚àö¬©todos parsing
 
 //chunk::= (stat (';'|&) )* (laststat (';'|&)|&)
 
@@ -142,11 +142,10 @@ private void parseStat()
                     parseVar();
                 }
                 accept(Token.BECOMES);
-                System.out.println(currentToken);
                 parseExplist();
              }
              else if (flag == 0)
-                System.out.println("erro");
+                error = true;
              break;
         }
             
@@ -208,7 +207,7 @@ private void parseStat()
         }
 
 
-// for Name (`=´ exp `,´ exp (`,´ exp|&) do block end |(`,` Name)* in explist do block end)
+// for Name (`=¬¥ exp `,¬¥ exp (`,¬¥ exp|&) do block end |(`,` Name)* in explist do block end)
         case Token.FOR:
         {
             acceptIt();
@@ -227,9 +226,7 @@ private void parseStat()
                 else
                     dummy();
                 accept(Token.DO);
-                System.out.println(currentToken);
                 parseBlock();
-                System.out.println(currentToken);
                 accept(Token.END);
             }
             else
@@ -243,7 +240,6 @@ private void parseStat()
                 parseExplist();
                 accept(Token.DO);
                 parseBlock();
-                System.out.println(currentToken);
                 accept(Token.END);
             }
             break;
@@ -290,7 +286,7 @@ private void parseStat()
             break;
         }
         default:
-            System.out.println("parse reject stat");
+            error = true;
     }
 }
 
@@ -317,7 +313,7 @@ private void parseLaststat()
             break;
         }
         default:
-            System.out.println("parse reject laststat");
+            error = true;
     }
 }
 
@@ -353,7 +349,7 @@ private void parseVar()
                 parsePrefixexp1();
                 parsePrefixexp2();
                 if (flag == 1)
-                    System.out.println("erro\n");
+                    error = true;
                 if (currentToken.kind == Token.LBRACKET)
                 {
                     acceptIt();
@@ -379,7 +375,7 @@ private void parseVar()
             parsePrefixexp1();
             parsePrefixexp2();
             if (flag == 1)
-                System.out.println("erro\n");
+                error = true;
             if(currentToken.kind == Token.LBRACKET)
             {
                 acceptIt();
@@ -394,7 +390,7 @@ private void parseVar()
             break;
         }
         default:
-            System.out.println("Parser reject parseVar\n");
+            error = true;
     } 
 }
 
@@ -415,7 +411,7 @@ private void parseNamelist()
         }
     }
     else
-        System.out.println("parse reject parseNamelist\n");
+        error = true;
 }
 
 //explist::= exp (`,` exp)*
@@ -587,13 +583,13 @@ private void parseExplist()
             }
             break;
         default:
-            System.out.println("erro explist\n");
+            error = true;
     }
 }
 
 
 
-/* exp::= (nil | false | true | Number | String | `‚Ä¶` | function | prefixexp | tableconstructor | unop exp) exp1 */
+/* exp::= (nil | false | true | Number | String | `‚Äö√Ñ¬∂` | function | prefixexp | tableconstructor | unop exp) exp1 */
 
 private void parseExp()
 {
@@ -644,7 +640,6 @@ private void parseExp()
         case Token.NORMALSTRING:
         {
             parseString();
-            System.out.println("mimi\n"+currentToken);
             parseExp1();
             break;
         }
@@ -713,7 +708,7 @@ private void parseExp()
         }
         default:
         {
-            System.out.println("parse exp reject");
+            error = true;
         }
     }
     parseExp1();
@@ -727,7 +722,6 @@ private void parseExp1()
     if (binopStarters())
     {
         parseBinop();
-        System.out.println(currentToken);
         parseExp();
         parseExp1();
     }
@@ -759,7 +753,7 @@ private void parsePrefixExp()
             break;
         }
         default:
-            System.out.println("parse reject prefixexp");            
+            error = true;
     }
 }
 
@@ -917,7 +911,7 @@ private void parseFuncbody()
     }
 }
 
-//parlist ::= Name parlist2  | `...´
+//parlist ::= Name parlist2  | `...¬¥
 
 private void parseParList()
 {
@@ -926,7 +920,6 @@ private void parseParList()
         case Token.NAME:
         {
             parseName();
-            System.out.println(currentToken);
             parseParlist2();
             break;
         }
@@ -936,12 +929,12 @@ private void parseParList()
             break;
         }
         default:
-            System.out.println("parse parlist reject");
+            error = true;
              
     }
 }
 
-//parlist2 ::= ‘,’ ( (Name parlist2) | ‘...’) | &
+//parlist2 ::= ‚Äò,‚Äô ( (Name parlist2) | ‚Äò...‚Äô) | &
 
 private void parseParlist2()
 {
@@ -967,18 +960,18 @@ private void parseParlist2()
 
 private void parseTableConstructor()
 {
-    if(currentToken.kind == Token.LCURLY)
+    
+    switch (currentToken.kind)
     {
-        acceptIt();
-        if(fieldlistStarters())
-        {
-            parseFieldList();
-        }
-        else
-        {
+        case Token.LCURLY:
+            acceptIt();
+            while(fieldlistStarters())
+            {
+              parseFieldList();
+            }
+            accept(Token.RCURLY);
+        default:
             dummy();
-        }
-        accept(Token.RCURLY);
     }
 }
 
@@ -1001,11 +994,11 @@ private void parseFieldList()
             dummy();
     }
     else
-        System.out.println("parse reject fieldlist");
+        error = true;
 }
 
 
-//field::= Name (`=` exp | prefixexp1 prefixexp2 exp1) | `[` exp `]` `=` exp | nil exp1| false exp1| true exp1| Number exp1| String exp1| `‚Ä¶` exp1| function exp1| '(' exp ')' prefixexp1 prefixexp2 exp1| tableconstructor exp1|  unop exp exp1 
+//field::= Name (`=` exp | prefixexp1 prefixexp2 exp1) | `[` exp `]` `=` exp | nil exp1| false exp1| true exp1| Number exp1| String exp1| `‚Äö√Ñ¬∂` exp1| function exp1| '(' exp ')' prefixexp1 prefixexp2 exp1| tableconstructor exp1|  unop exp exp1 
 
 private void parseField()
 {
@@ -1136,7 +1129,7 @@ private void parseField()
             break;
         }
         default:
-            System.out.println("parse reject field");
+            error = true;
     }
 }
 
@@ -1157,13 +1150,13 @@ private void parseFieldSep()
             break;
         }
         default:
-            System.out.println("parse reject fieldsep");
+            error = true;
     }            
 }
 
-/*binop::= `+¬¥ | `-¬¥ | `*¬¥ | `/¬¥ | `^¬¥ | `%¬¥ | `..¬¥ |
+/*binop::= `+¬¨¬• | `-¬¨¬• | `*¬¨¬• | `/¬¨¬• | `^¬¨¬• | `%¬¨¬• | `..¬¨¬• |
 
-                   `<¬¥ | `<=¬¥ | `>¬¥ | `>=¬¥ | `==¬¥ | `~=¬¥ |
+                   `<¬¨¬• | `<=¬¨¬• | `>¬¨¬• | `>=¬¨¬• | `==¬¨¬• | `~=¬¨¬• |
 
                    and | or*/
 
@@ -1248,7 +1241,7 @@ private void parseBinop()
         }
         default:
         {
-            System.out.println("parse reject binop");
+            error = true;
         } 
     }
 }
@@ -1275,11 +1268,11 @@ private void parseUnop()
             break;
         }
         default:
-            System.out.println("parse reject unop"); 
+            error = true;
     }
 }
 
-// demais parsing segundo o livro p√°gina 99
+// demais parsing segundo o livro p‚àö¬∞gina 99
 
 private void parseName()
 {
@@ -1288,7 +1281,7 @@ private void parseName()
         currentToken = scanner.scan();
     }
     else
-        System.out.println("parse reject Name");
+        error = true;
 }
 
 private void parseNumber()
@@ -1298,7 +1291,7 @@ private void parseNumber()
         currentToken = scanner.scan();            
     }
     else
-        System.out.println("parse reject number");
+        error = true;
 }
 
 private void parseString()
@@ -1308,7 +1301,7 @@ private void parseString()
         currentToken = scanner.scan();
     }
     else  
-        System.out.println("parse reject string");
+        error = true;
 }
 
 // dummy
@@ -1318,19 +1311,22 @@ public static void main (String args[])
 {
 //    Token token;    
     Parser parser = new Parser();
-    SourceFile source = new SourceFile("entradas.txt");
+    SourceFile source = new SourceFile("teste.txt");
     parser.scanner = new Scanner(source);
 
         parser.currentToken = parser.scanner.scan();
         if(parser.currentToken == null)
             System.out.println("vazio");
-        System.out.println(parser.currentToken);
         parser.parseChunk();
-
+        if(parser.error)
+                System.out.println("PARSER REJECT");
+        else
+                System.out.println("PARSER OK");
+/*
 
     if(parser.currentToken.kind != Token.EOT) 
-        System.out.println("erroxxx");
-
+        parser.error = true;
+*/
 }
 
 }

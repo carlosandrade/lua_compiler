@@ -1,0 +1,6 @@
+ Kind=<name>	 spelling=io	 position=(1, 1)
+ Kind=.	 spelling=.	 position=(1, 1)
+ Kind=<name>	 spelling=write	 position=(1, 1)
+ Kind=(	 spelling=(	 position=(1, 1)
+ Kind=<normalstring>	 spelling="Hello"	 position=(1, 1)
+ Kind=)	 spelling=)	 position=(1, 1)
