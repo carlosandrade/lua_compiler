@@ -8,7 +8,7 @@ Credits go for me and Clara Aderne, and also parts of the book code freely avail
 
 The method used was the recursive descent parsing explained on the book afore mentioned. 
 
-This code was a created for a Compilers course assignment and may contain error or like proper documentation.
+This code was a created for a Compilers course assignment and may contain error or lack proper documentation.
 
 Usage of the code is as follow:
 
