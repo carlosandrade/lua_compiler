@@ -67,7 +67,7 @@ void accept (int tokenExpected)
         currentToken = scanner.scan();
     }
     else
-        System.out.println("erro accept");
+        System.out.println("PARSER REJECT");
 }
 
 void acceptIt()
