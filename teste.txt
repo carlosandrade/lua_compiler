@@ -1,5 +1,1 @@
--- this would raise an error
---[[
-b = Account:new(nil,"DEMO")
-b:withdraw(100.00)
---]]
+io.write("Hello")

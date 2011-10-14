@@ -12,4 +12,8 @@ Comment ok
 LineComment ok
 long string ok 
 
+S-> A | B
 
+
+S-> (aaA | aa) | (aaB| a)
+s-> aa(A|&) | a(aB|&)

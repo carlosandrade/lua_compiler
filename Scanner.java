@@ -430,6 +430,7 @@ private int scanComment()
     take('[');
     while(!((foundDoubleRightBrackets) || (currentChar == SourceFile.EOT))) //Existe uma condicao de parada do ']]' dentro tambem
     {
+        System.out.print(currentChar);
         if(currentChar == ']')
         {
             takeIt();
@@ -634,7 +635,7 @@ private int scanInt(){
 public static void main(String args[])
 {
     Token tok;
-    SourceFile source = new SourceFile("teste.txt");
+    SourceFile source = new SourceFile("entradas.txt");
     Scanner scanner = new Scanner(source);
     do{
         tok = scanner.scan();

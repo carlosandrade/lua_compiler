@@ -3,28 +3,64 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>Scanner.java</string>
+	<string>Parser.java</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>Parser.java</string>
 			<key>lastUsed</key>
-			<date>2011-10-10T04:34:45Z</date>
-		</dict>
-		<dict>
-			<key>filename</key>
-			<string>Scanner.java</string>
-			<key>lastUsed</key>
-			<date>2011-10-10T04:50:40Z</date>
+			<date>2011-10-14T04:24:20Z</date>
 			<key>selected</key>
 			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
+			<string>checklist.txt</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T01:12:02Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>entradasScanner.txt</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T04:23:45Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>Scanner.java</string>
+			<key>lastUsed</key>
+			<date>2011-10-13T19:38:37Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
 			<string>Token.java</string>
 			<key>lastUsed</key>
-			<date>2011-10-10T04:50:40Z</date>
+			<date>2011-10-13T06:12:50Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>gramaticas.txt</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T01:12:07Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>teste.txt</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T04:24:20Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>SourceFile.java</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T01:12:09Z</date>
+		</dict>
+		<dict>
+			<key>filename</key>
+			<string>SourcePosition.java</string>
+			<key>lastUsed</key>
+			<date>2011-10-14T04:23:47Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
@@ -36,69 +72,175 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>19</integer>
+				<integer>45</integer>
 				<key>line</key>
-				<integer>443</integer>
+				<integer>137</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>8</integer>
+			<integer>121</integer>
 		</dict>
 		<key>Scanner.java</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>27</integer>
 				<key>line</key>
-				<integer>35</integer>
+				<integer>80</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>26</integer>
+			<integer>75</integer>
 		</dict>
-		<key>Token.java</key>
+		<key>SourceFile.java</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>4</integer>
+				<integer>21</integer>
 				<key>line</key>
-				<integer>12</integer>
+				<integer>44</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>149</integer>
+			<integer>24</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>10</integer>
 				<key>line</key>
-				<integer>12</integer>
+				<integer>44</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>4</integer>
+				<integer>21</integer>
 				<key>line</key>
-				<integer>12</integer>
+				<integer>44</integer>
 			</dict>
+		</dict>
+		<key>SourcePosition.java</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>14</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>Token.java</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>5</integer>
+				<key>line</key>
+				<integer>81</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>76</integer>
+		</dict>
+		<key>checklist.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>21</integer>
+				<key>line</key>
+				<integer>18</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>entradasScanner.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>17</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>8</integer>
+		</dict>
+		<key>gramaticas.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>20</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>25</integer>
+			</dict>
+		</dict>
+		<key>teste.txt</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>17</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
 		</dict>
 	</dict>
 	<key>openDocuments</key>
 	<array>
-		<string>Parser.java</string>
 		<string>Token.java</string>
+		<string>Parser.java</string>
 		<string>Scanner.java</string>
+		<string>teste.txt</string>
+		<string>entradasScanner.txt</string>
+		<string>SourceFile.java</string>
+		<string>SourcePosition.java</string>
+		<string>checklist.txt</string>
+		<string>gramaticas.txt</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{544, 24}, {853, 713}}</string>
+	<string>{{195, 0}, {1073, 778}}</string>
 </dict>
 </plist>

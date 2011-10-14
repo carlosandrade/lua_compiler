@@ -1,7 +1,9 @@
 public class Parser {
 
+private int flag;
 private Token currentToken;
 private Scanner scanner; 
+private SourcePosition previousTokenPosition = new SourcePosition();
 
 //m√©todos starters
 
@@ -31,7 +33,7 @@ private boolean explistStarters()
 
 private boolean binopStarters()
 {
-    if((currentToken.kind == Token.MINUS) || (currentToken.kind == Token.PLUS) || (currentToken.kind == Token.TIMES) || (currentToken.kind == Token.RBAR) || (currentToken.kind == Token.CHAPEU) || (currentToken.kind == Token.PERCENT) || (currentToken.kind == Token.TWODOTES) || (currentToken.kind == Token.LESSTHAN) || (currentToken.kind == Token.LESSOREQUALTHAN) || (currentToken.kind == Token.MOREOREQUALTHAN) || (currentToken.kind == Token.MORETHAN) || (currentToken.kind == Token.BECOMES) || (currentToken.kind == Token.NOTEQUALS) || (currentToken.kind == Token.AND) || (currentToken.kind == Token.OR))
+    if((currentToken.kind == Token.MINUS) || (currentToken.kind == Token.PLUS) || (currentToken.kind == Token.TIMES) || (currentToken.kind == Token.RBAR) || (currentToken.kind == Token.CHAPEU) || (currentToken.kind == Token.PERCENT) || (currentToken.kind == Token.TWODOTES) || (currentToken.kind == Token.LESSTHAN) || (currentToken.kind == Token.LESSOREQUALTHAN) || (currentToken.kind == Token.MOREOREQUALTHAN) || (currentToken.kind == Token.MORETHAN) || (currentToken.kind == Token.EQUALS) || (currentToken.kind == Token.NOTEQUALS) || (currentToken.kind == Token.AND) || (currentToken.kind == Token.OR))
         return true;
     else
         return false;
@@ -61,6 +63,7 @@ void accept (int tokenExpected)
 {
     if(currentToken.kind == tokenExpected)
     {
+        previousTokenPosition = currentToken.position;
         currentToken = scanner.scan();
     }
     else
@@ -108,126 +111,49 @@ private void parseBlock()
     parseChunk();
 }
 
-/*
-stat::= 
-Name(prefixexp1 prefixexp2(((`[` exp `]` |  `.` Name)| &) (',' var)* '=' explist | ( (`:` Name|&) args))) |
-'(' exp ')'prefixexp1 prefixexp2( (`[` exp `]` |  `.` Name) (',' var)* '=' explist |( (`:` Name|&) args) )|
-		do block end |
-		while exp do block end |
-		repeat block until exp |
-		if exp then block (elseif exp then block)* ((else block) | & ) end|
-for (Name `=` exp `,` exp ((`,` exp) | & ) do block end | 
-namelist in explist do block end)|
-function funcname funcbody |
-local (function Name funcbody |
-namelist ((`=` explist) | & ))
 
-*/
+//stat 
 
 private void parseStat()
 {
+        
     switch(currentToken.kind)
     {
-        case Token.NAME:
+        case Token.NAME: case Token.LPAREN:
         {
-            parseName();
-            if (prefixexp1Starters())
-            {
-                acceptIt();
-                if(currentToken.kind == Token.LBRACKET)
-                {
-                    acceptIt();
-                    parseExp();
-                    accept(Token.RBRACKET);
-                    while(currentToken.kind == Token.COMMA)
-                    {
-                        acceptIt();
-                        parseVar();
-                    }
-                    accept(Token.BECOMES);
-                    parseExplist();
-                }
-                else if (currentToken.kind == Token.DOT)
-                {
-                    acceptIt();
-                    parseName();
-                    while(currentToken.kind == Token.COMMA)
-                    {
-                        acceptIt();
-                        parseVar();
-                    }
-                    accept(Token.BECOMES);
-                    parseExplist();
-                }
-                else 
-                {
-                    dummy();
-                    while(currentToken.kind == Token.COMMA)
-                    {
-                        acceptIt();
-                        parseVar();
-                    }
-                    accept(Token.BECOMES);
-                    parseExplist();
-                }
-                if (currentToken.kind == Token.COLON)
-                {
-                    acceptIt();
-                    parseName();
-                    parseArgs();
-                }
-                else
-                {
-                    dummy();
-                    parseArgs();
-                }
-            }
-            else if (currentToken.kind == Token.LPAREN)
+            if(currentToken.kind == Token.LPAREN)
             {
                 acceptIt();
                 parseExp();
                 accept(Token.RPAREN);
-                parsePrefixexp1();
-                parsePrefixexp2();
-                if(currentToken.kind == Token.LBRACKET)
-                {
-                    acceptIt();
-                    parseExp();
-                    accept(Token.RBRACKET);
-                    while(currentToken.kind == Token.COMMA)
-                    {
-                        acceptIt();
-                        parseVar();
-                    }
-                    accept(Token.BECOMES);
-                    parseExplist();
-                }
-                else if (currentToken.kind == Token.DOT)
-                {
-                    acceptIt();
-                    parseName();
-                    while(currentToken.kind == Token.COMMA)
-                    {
-                        acceptIt();
-                        parseVar();
-                    }
-                    accept(Token.BECOMES);
-                    parseExplist();
-                }
-                if (currentToken.kind == Token.COLON)
-                {
-                    acceptIt();
-                    parseName();
-                    parseArgs();
-                }
-                else
-                {
-                    dummy();
-                    parseArgs();
-                }
             }
-            break;
+            else
+                parseName();
+                if (prefixexp1Starters())
+                {
+                    parsePrefixexp1();
+                    parsePrefixexp2();
+                }
+             if ((currentToken.kind == Token.COMMA) || (currentToken.kind == Token.BECOMES))
+             {                 
+                while(currentToken.kind == Token.COMMA)
+                {
+                    acceptIt();
+                    parseVar();
+                }
+                accept(Token.BECOMES);
+                System.out.println(currentToken);
+                parseExplist();
+             }
+             else if (flag == 0)
+                System.out.println("erro");
+             break;
         }
+            
+        
+        
+
+//do block end
         case Token.DO:
         {
             acceptIt();
@@ -235,6 +161,7 @@ private void parseStat()
             accept(Token.END);
             break;
         }
+//while exp do block end
         case Token.WHILE:
         {
             acceptIt();
@@ -244,6 +171,8 @@ private void parseStat()
             accept(Token.END);
             break;
         }
+
+//repeat block until exp 
         case Token.REPEAT:
         {
             acceptIt();
@@ -252,6 +181,8 @@ private void parseStat()
             parseExp();
             break;
         }
+
+//if exp then block (elseif exp then block)* ((else block) | & ) end
         case Token.IF:
         {
             acceptIt();
@@ -275,6 +206,9 @@ private void parseStat()
             accept(Token.END);
             break;
         }
+
+
+// for Name (`=´ exp `,´ exp (`,´ exp|&) do block end |(`,` Name)* in explist do block end)
         case Token.FOR:
         {
             acceptIt();
@@ -293,7 +227,9 @@ private void parseStat()
                 else
                     dummy();
                 accept(Token.DO);
+                System.out.println(currentToken);
                 parseBlock();
+                System.out.println(currentToken);
                 accept(Token.END);
             }
             else
@@ -307,11 +243,14 @@ private void parseStat()
                 parseExplist();
                 accept(Token.DO);
                 parseBlock();
+                System.out.println(currentToken);
                 accept(Token.END);
             }
             break;
             
         }
+
+//function funcname funcbody 
         case Token.FUNCTION:
         {
             acceptIt();            
@@ -319,6 +258,8 @@ private void parseStat()
             parseFuncbody();
             break;
         }
+
+//local (function Name funcbody | namelist ((`=` explist) | & ))
         case Token.LOCAL:
         {
             acceptIt();
@@ -364,7 +305,7 @@ private void parseLaststat()
             acceptIt();
             if(explistStarters())
             {
-                acceptIt();
+                parseExplist();
             }
             else
                 dummy();
@@ -408,8 +349,11 @@ private void parseVar()
         {
             parseName();
             if (prefixexp1Starters())
-            {
-                acceptIt();
+            {                
+                parsePrefixexp1();
+                parsePrefixexp2();
+                if (flag == 1)
+                    System.out.println("erro\n");
                 if (currentToken.kind == Token.LBRACKET)
                 {
                     acceptIt();
@@ -434,6 +378,8 @@ private void parseVar()
             accept(Token.RPAREN);
             parsePrefixexp1();
             parsePrefixexp2();
+            if (flag == 1)
+                System.out.println("erro\n");
             if(currentToken.kind == Token.LBRACKET)
             {
                 acceptIt();
@@ -476,19 +422,176 @@ private void parseNamelist()
 
 private void parseExplist()
 {
-    if (explistStarters())
+    switch(currentToken.kind)
     {    
-        acceptIt();    
-        while(currentToken.kind == Token.COMMA)
-        {
-            acceptIt();
-            if(explistStarters())
+        case Token.TRUE:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
                 acceptIt();
-        }    
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.FALSE:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.NIL:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.HEX:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.FLOAT:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.INT:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.EXP:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.NORMALSTRING:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.CHARSTRING:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.LONGSTRING:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.THREEDOTES:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.FUNCTION:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.NAME:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.LPAREN:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.LCURLY:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;  
+        case Token.MINUS:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;
+        case Token.NOT:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;
+        case Token.VELHA:
+            parseExp();    
+            while(currentToken.kind == Token.COMMA)
+            {
+                acceptIt();
+                if(explistStarters())
+                    parseExp();
+            }
+            break;
+        default:
+            System.out.println("erro explist\n");
     }
-    else
-        System.out.println("parse explist reject");
 }
+
+
 
 /* exp::= (nil | false | true | Number | String | `‚Ä¶` | function | prefixexp | tableconstructor | unop exp) exp1 */
 
@@ -541,6 +644,7 @@ private void parseExp()
         case Token.NORMALSTRING:
         {
             parseString();
+            System.out.println("mimi\n"+currentToken);
             parseExp1();
             break;
         }
@@ -622,7 +726,8 @@ private void parseExp1()
 {
     if (binopStarters())
     {
-        acceptIt();
+        parseBinop();
+        System.out.println(currentToken);
         parseExp();
         parseExp1();
     }
@@ -669,36 +774,42 @@ private void parsePrefixexp1()
             acceptIt();
             parseName();
             parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
         case Token.LPAREN:
-        {    
-            acceptIt();
+        {   
+            parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
         case Token.LCURLY:
         {    
-            acceptIt();
+            parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
         case Token.NORMALSTRING:
         {    
-            parseString();
+            parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
         case Token.CHARSTRING:
         {    
-            parseString();
+            parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
         case Token.LONGSTRING:
         {    
-            parseString();
+            parseArgs();
+            flag = 1;
             parsePrefixexp1();
             break;
         }
@@ -715,6 +826,7 @@ private void parsePrefixexp2()
     {
         case Token.LBRACKET:
         {
+            flag = 0;            
             acceptIt();
             parseExp();
             accept(Token.RBRACKET);
@@ -723,13 +835,12 @@ private void parsePrefixexp2()
             break;
         }
         case Token.DOT:
-        {
+            flag = 0;            
             acceptIt();
             parseName();
             parsePrefixexp1();
             parsePrefixexp2();
             break;
-        }
         default:
             dummy();
     }
@@ -745,13 +856,7 @@ private void parseArgs()
         {
             acceptIt();
             if(explistStarters())
-            {
-                acceptIt();
-            }
-            else
-            {
-                dummy();
-            }
+                parseExplist();
             accept(Token.RPAREN);
             break;
         }
@@ -812,7 +917,7 @@ private void parseFuncbody()
     }
 }
 
-//parlist::= namelist ( (`,` `‚Ä¶` )|&) | `‚Ä¶`
+//parlist ::= Name parlist2  | `...´
 
 private void parseParList()
 {
@@ -820,16 +925,9 @@ private void parseParList()
     {
         case Token.NAME:
         {
-            parseNamelist();
-            if(currentToken.kind == Token.COMMA)
-            {
-                acceptIt();
-                accept(Token.THREEDOTES);            
-            }
-            else
-            {
-                dummy();
-            }
+            parseName();
+            System.out.println(currentToken);
+            parseParlist2();
             break;
         }
         case Token.THREEDOTES:
@@ -842,6 +940,28 @@ private void parseParList()
              
     }
 }
+
+//parlist2 ::= ‘,’ ( (Name parlist2) | ‘...’) | &
+
+private void parseParlist2()
+{
+    switch(currentToken.kind)
+    {
+    case Token.COMMA:
+        acceptIt();
+        if(currentToken.kind == Token.NAME)
+        {
+            parseName();
+            parseParlist2();
+        }
+        else if(currentToken.kind == Token.THREEDOTES)
+            acceptIt();
+        break;
+    default:
+        dummy();   
+    } 
+}
+
 
 //tableconstructor::= `{` (fieldlist|&) `}`
 
@@ -1106,7 +1226,7 @@ private void parseBinop()
             acceptIt();
             break;
         }
-        case Token.BECOMES:
+        case Token.EQUALS:
         {
             acceptIt();
             break;
@@ -1182,7 +1302,7 @@ private void parseNumber()
 }
 
 private void parseString()
-{
+{   
     if((currentToken.kind == Token.NORMALSTRING) || (currentToken.kind == Token.CHARSTRING) || (currentToken.kind == Token.LONGSTRING))
     {
         currentToken = scanner.scan();
@@ -1198,10 +1318,9 @@ public static void main (String args[])
 {
 //    Token token;    
     Parser parser = new Parser();
-    SourceFile source = new SourceFile("teste.txt");
+    SourceFile source = new SourceFile("entradas.txt");
     parser.scanner = new Scanner(source);
 
-    do {
         parser.currentToken = parser.scanner.scan();
         if(parser.currentToken == null)
             System.out.println("vazio");
@@ -1209,7 +1328,8 @@ public static void main (String args[])
         parser.parseChunk();
 
 
-    }while(parser.currentToken.kind != Token.EOT);
+    if(parser.currentToken.kind != Token.EOT) 
+        System.out.println("erroxxx");
 
 }
 
