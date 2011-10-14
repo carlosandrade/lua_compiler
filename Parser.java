@@ -1318,15 +1318,15 @@ public static void main (String args[])
         if(parser.currentToken == null)
             System.out.println("vazio");
         parser.parseChunk();
+        if(parser.currentToken.kind != Token.EOT) 
+            parser.error = true;
         if(parser.error)
                 System.out.println("PARSER REJECT");
         else
                 System.out.println("PARSER OK");
-/*
 
-    if(parser.currentToken.kind != Token.EOT) 
-        parser.error = true;
-*/
+
+
 }
 
 }
